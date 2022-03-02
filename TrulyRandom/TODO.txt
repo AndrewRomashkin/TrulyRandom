@@ -1,0 +1,4 @@
+﻿1. Documentation
+2. Compress video stream via DirectShow
+3. Save tester state
+4. Test every N-th block
