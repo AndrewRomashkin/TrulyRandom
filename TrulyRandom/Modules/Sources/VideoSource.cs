@@ -1,4 +1,5 @@
-﻿using TrulyRandom.Devices;
+﻿using System;
+using TrulyRandom.Devices;
 using TrulyRandom.Models;
 
 namespace TrulyRandom.Modules.Sources
@@ -86,6 +87,7 @@ namespace TrulyRandom.Modules.Sources
         ///<inheritdoc/>
         public override void Dispose()
         {
+            GC.SuppressFinalize(this);
             base.Dispose();
             Device.Dispose();
         }

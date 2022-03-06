@@ -58,7 +58,6 @@ namespace TrulyRandom.DirectShow
         /// <summary>
         /// Destroys the instance of the <see cref="AMMediaType"/> class.
         /// </summary>
-        /// 
         ~AMMediaType()
         {
             Dispose(false);
@@ -67,7 +66,6 @@ namespace TrulyRandom.DirectShow
         /// <summary>
         /// Dispose the object.
         /// </summary>
-        ///
         public void Dispose()
         {
             Dispose(true);
@@ -91,9 +89,7 @@ namespace TrulyRandom.DirectShow
 
             if (unkPtr != IntPtr.Zero)
             {
-#pragma warning disable CA1416 // Validate platform compatibility
                 Marshal.Release(unkPtr);
-#pragma warning restore CA1416 // Validate platform compatibility
                 unkPtr = IntPtr.Zero;
             }
         }

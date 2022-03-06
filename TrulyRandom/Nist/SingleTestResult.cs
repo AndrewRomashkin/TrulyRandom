@@ -1,165 +1,35 @@
-﻿using System;
-using System.Linq;
-
-namespace TrulyRandom
+﻿namespace TrulyRandom
 {
     public partial class NistTests
     {
-        public enum TestResultEnum { Success, SuccessWithFailedSubtests, BadPValues, IncufficientCycles, BadHistory }
-        public enum SubtestResultEnum { Success, SuccessByDefault, SuccessByHistory, Failure }
-
-        public class SingleTestResult
+        /// <summary>
+        /// Reasult of a single test, not evaluated yet
+        /// </summary>
+        public struct SingleTestResult
         {
-            public bool Success { get; private set; } = false;
-            public double SuccessfulSubtestProportion { get; private set; } = 0;
-            public SubtestResultEnum[] SubtestResults { get; private set; } = new SubtestResultEnum[0];
-            public double[] PValues { get; private set; } = new double[0];
-            public double?[] HistoricalSuccessRate { get; private set; } = new double?[0];
-            public int ActuallyTestedBits { get; private set; } = 0;
-            public string Report { get; private set; } = "";
-            public TestResultEnum Result { get; private set; } = TestResultEnum.BadHistory;
-            public int Time { get; private set; } = 0;
+            /// <summary>
+            /// P-values for the subtests. P-value is a measure of how random the sequence is according to this test or subtest
+            /// </summary>
+            public readonly double[] PValues;
+            /// <summary>
+            /// Number of bits which was actually tested. Some tests discard some of the data if it is not enough to form a whole block
+            /// </summary>
+            public readonly int ActuallyTestedBits;
+            /// <summary>
+            /// Human-readable report about the test
+            /// </summary>
+            public readonly string Report;
+            /// <summary>
+            /// Duration of the testing
+            /// </summary>
+            public readonly int Time;
 
-            internal SingleTestResult(RawTestResult rawTestResult, TestParameters parameters, TestsEnum test, double[][] testHistory)
+            internal SingleTestResult(double[] pValues, int actuallyTestedBits, string report, int time)
             {
-                Time = rawTestResult.Time;
-                PValues = rawTestResult.PValues;
-                ActuallyTestedBits = rawTestResult.ActuallyTestedBits;
-
-                SuccessfulSubtestProportion = rawTestResult.PValues.Where(x => x >= parameters.SignificanceLevel).Count() / (double)rawTestResult.PValues.Length;
-                SubtestResults = new SubtestResultEnum[rawTestResult.PValues.Length];
-
-                testHistory = testHistory.Where(x => x.Length == rawTestResult.PValues.Length).TakeLast(parameters.LongTermEvaluation.PreviousTestResultsToCheck).ToArray();
-
-                HistoricalSuccessRate = new double?[rawTestResult.PValues.Length];
-
-                for (int i = 0; i < rawTestResult.PValues.Length; i++)
-                {
-                    if (testHistory.Length >= parameters.LongTermEvaluation.MinPreviousTestResultsToCheck)
-                    {
-                        HistoricalSuccessRate[i] = (testHistory.TakeLast(parameters.LongTermEvaluation.PreviousTestResultsToCheck).Where(x => x[i] >= parameters.SignificanceLevel).Count() + (rawTestResult.PValues[i] >= parameters.SignificanceLevel ? 1 : 0)) /
-                        ((double)testHistory.Length + 1);
-                    }
-
-                    if (rawTestResult.PValues[i] >= parameters.SignificanceLevel)
-                    {
-                        SubtestResults[i] = SubtestResultEnum.Success;
-                    }
-                    else if (parameters.LongTermEvaluation.PassByDefault && testHistory.Length < parameters.LongTermEvaluation.MinPreviousTestResultsToCheck)
-                    {
-                        SubtestResults[i] = SubtestResultEnum.SuccessByDefault;
-                    }
-                    else if (HistoricalSuccessRate[i].HasValue && HistoricalSuccessRate[i].Value >= 1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate)
-                    {
-                        SubtestResults[i] = SubtestResultEnum.SuccessByHistory;
-                    }
-                    else
-                    {
-                        SubtestResults[i] = SubtestResultEnum.Failure;
-                    }
-                }
-
-                Success = (1 - SuccessfulSubtestProportion) <= parameters.AllowedFailedSubtestProportion && !SubtestResults.Contains(SubtestResultEnum.Failure);
-
-                if (Success && SuccessfulSubtestProportion == 1)
-                {
-                    Result = TestResultEnum.Success;
-                }
-                else if (Success && SuccessfulSubtestProportion != 1 && (1 - SuccessfulSubtestProportion) <= parameters.AllowedFailedSubtestProportion)
-                {
-                    Result = TestResultEnum.SuccessWithFailedSubtests;
-                }
-                else if (!Success && (1 - SuccessfulSubtestProportion) > parameters.AllowedFailedSubtestProportion)
-                {
-                    Result = TestResultEnum.BadPValues;
-                }
-                else if (!Success && (test == TestsEnum.RandomExcursions || test == TestsEnum.RandomExcursions) && rawTestResult.PValues.All(x => x == 0))
-                {
-                    Result = TestResultEnum.IncufficientCycles;
-                }
-                else
-                {
-                    Result = TestResultEnum.BadHistory;
-                }
-
-                Report = rawTestResult.Report;
-
-                if (rawTestResult.PValues.Length == 1)
-                {
-                    Report += "\n\nHistory: ";
-                    if (HistoricalSuccessRate[0] == null)
-                    {
-                        Report += $"History is too short ({testHistory.Length} < {parameters.LongTermEvaluation.MinPreviousTestResultsToCheck})";
-                    }
-                    else if (HistoricalSuccessRate[0].Value >= 1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate)
-                    {
-                        Report += $"Passed ({HistoricalSuccessRate[0].Value:F2} >= {1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate:F2})";
-                    }
-                    else
-                    {
-                        Report += $"Failed ({HistoricalSuccessRate[0].Value:F2} < {1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate:F2})";
-                    }
-                    Report += "\n\nResult: ";
-
-                    switch (Result)
-                    {
-                        case TestResultEnum.Success:
-                            Report += $"SUCCESS";
-                            break;
-                        case TestResultEnum.BadPValues:
-                            Report += $"FAILURE (bad p-value)";
-                            break;
-                        case TestResultEnum.BadHistory:
-                            Report += $"FAILURE (bad history)";
-                            break;
-                        default:
-                            Report += $"FAILURE (unknown reason)";
-                            break;
-                    }
-                }
-                else
-                {
-                    Report += "\n\nHistory:\n";
-                    for (int i = 0; i < rawTestResult.PValues.Length; i++)
-                    {
-                        if (HistoricalSuccessRate[i] == null)
-                        {
-                            Report += $"History is too short ({testHistory.Length} < {parameters.LongTermEvaluation.MinPreviousTestResultsToCheck})\n";
-                        }
-                        else if (HistoricalSuccessRate[i].Value >= 1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate)
-                        {
-                            Report += $"Passed ({HistoricalSuccessRate[i].Value:F2} >= {1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate:F2})\n";
-                        }
-                        else
-                        {
-                            Report += $"Failed ({HistoricalSuccessRate[i].Value:F2} < {1 - parameters.LongTermEvaluation.AllowedSinglePValueFailureRate:F2})\n";
-                        }
-                    }
-
-                    Report += "\nResult: ";
-
-                    switch (Result)
-                    {
-                        case TestResultEnum.Success:
-                            Report += $"SUCCESS";
-                            break;
-                        case TestResultEnum.SuccessWithFailedSubtests:
-                            Report += $"SUCCESS (some subtests failed)";
-                            break;
-                        case TestResultEnum.BadPValues:
-                            Report += $"FAILURE (too much bad p-values)";
-                            break;
-                        case TestResultEnum.BadHistory:
-                            Report += $"FAILURE (bad history for at least one of p-values)";
-                            break;
-                        case TestResultEnum.IncufficientCycles:
-                            Report += $"FAILURE (incufficient cycles)";
-                            break;
-                        default:
-                            Report += $"FAILURE (unknown reason)";
-                            break;
-                    }
-                }
+                PValues = pValues;
+                ActuallyTestedBits = actuallyTestedBits;
+                Report = report;
+                Time = time;
             }
         }
     }

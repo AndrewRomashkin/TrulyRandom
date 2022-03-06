@@ -7,6 +7,9 @@ using TrulyRandom.Modules.Extractors;
 
 namespace UnitTests
 {
+    /// <summary>
+    /// Evaluates the functionality of different extractors
+    /// </summary>
     [TestClass]
     public class Extractors
     {
@@ -36,7 +39,7 @@ namespace UnitTests
         public void DeflateE()
         {
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
-            DeflateExtractor extractor = new DeflateExtractor();
+            DeflateExtractor extractor = new();
             extractor.BatchSize = 5000;
             extractor.AddSource(buffer);
             extractor.Start();
@@ -59,7 +62,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Generate1MbBadSequence());
 
-            DeflateExtractor extractor = new DeflateExtractor();
+            DeflateExtractor extractor = new();
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -79,7 +82,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
 
-            VonNeumannExtractor extractor = new VonNeumannExtractor();
+            VonNeumannExtractor extractor = new();
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -101,7 +104,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Generate1MbBadSequence());
 
-            VonNeumannExtractor extractor = new VonNeumannExtractor();
+            VonNeumannExtractor extractor = new();
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -123,7 +126,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
 
-            HashExtractor extractor = new HashExtractor();
+            HashExtractor extractor = new();
             extractor.BatchSize = 5000;
             extractor.HashFunction = HashExtractor.HashFunctionEnum.SHA512;
             extractor.InputBlockSize = 125; //Exactly 1000 blocks, 1000 bits each
@@ -148,7 +151,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Generate1MbBadSequence());
 
-            HashExtractor extractor = new HashExtractor();
+            HashExtractor extractor = new();
             extractor.BatchSize = 5000;
             extractor.Chaining = false;
             extractor.HashFunction = HashExtractor.HashFunctionEnum.SHA512;
@@ -174,7 +177,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
 
-            ShuffleExtractor extractor = new ShuffleExtractor();
+            ShuffleExtractor extractor = new();
             extractor.BlockSize = 1000;
             extractor.BatchSize = 125000;
             extractor.AddSource(buffer);
@@ -198,7 +201,7 @@ namespace UnitTests
         {
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
 
-            ShuffleExtractor extractor = new ShuffleExtractor();
+            ShuffleExtractor extractor = new();
             extractor.BlockSize = 1;
             extractor.BatchSize = 125000;
             extractor.AddSource(buffer);
@@ -223,7 +226,7 @@ namespace UnitTests
             //buffer of only ones guarantees that at some time random number should be repicked (because it's larger than a constraint) over and over until data depletes
             Utils.InvokePrivate(buffer, "AddData", Enumerable.Repeat((byte)0xFF, 125000).ToArray());
 
-            ShuffleExtractor extractor = new ShuffleExtractor();
+            ShuffleExtractor extractor = new();
             extractor.BlockSize = 1;
             extractor.BatchSize = 125000;
             extractor.AddSource(buffer);

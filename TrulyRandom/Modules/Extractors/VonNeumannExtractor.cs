@@ -59,7 +59,7 @@ namespace TrulyRandom.Modules.Extractors
         // 11 -> -
         byte[] ProcessData(BitArray data, int nesting)
         {
-            List<bool> result = new List<bool>();
+            List<bool> result = new();
 
             for (int i = 0; i < data.Length / 2; i++)
             {

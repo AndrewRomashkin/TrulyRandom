@@ -52,7 +52,7 @@ namespace TrulyRandom.Devices
         /// </summary>
         public static DeviceDescriptor[] AvailableDevices => GetAvailableDevices(Clsid.AudioInputDevice);
 
-        static object autoSearchLock = new object();
+        static readonly object autoSearchLock = new();
 
         /// <summary>
         /// Returns a static lock object for all instances of this type
@@ -88,7 +88,7 @@ namespace TrulyRandom.Devices
 
         private protected override AMMediaType GetAMMediaType()
         {
-            AMMediaType mediaType = new AMMediaType();
+            AMMediaType mediaType = new();
             mediaType.MajorType = MediaType.Audio;
 
             return mediaType;
@@ -106,8 +106,7 @@ namespace TrulyRandom.Devices
 
         private protected override void GetAndConfigurePinCapabilities(ICaptureGraphBuilder2 graphBuilder, IBaseFilter baseFilter)
         {
-            object streamConfigObject;
-            graphBuilder.FindInterface(PinCategory.Capture, MediaType.Audio, baseFilter, typeof(IAMStreamConfig_Audio).GUID, out streamConfigObject);
+            graphBuilder.FindInterface(PinCategory.Capture, MediaType.Audio, baseFilter, typeof(IAMStreamConfig_Audio).GUID, out object streamConfigObject);
 
             if (streamConfigObject != null)
             {
@@ -121,7 +120,7 @@ namespace TrulyRandom.Devices
                 {
                 }
 
-                AudioCapabilities[] audioCapabilities = new AudioCapabilities[0];
+                AudioCapabilities[] audioCapabilities = Array.Empty<AudioCapabilities>();
                 if (streamConfig != null)
                 {
                     try
@@ -146,7 +145,7 @@ namespace TrulyRandom.Devices
             }
         }
 
-        private void SetCapabilities(IAMStreamConfig_Audio streamConfig, AudioCapabilities capabilities)
+        private static void SetCapabilities(IAMStreamConfig_Audio streamConfig, AudioCapabilities capabilities)
         {
             if (capabilities == null)
             {
@@ -154,17 +153,16 @@ namespace TrulyRandom.Devices
             }
 
             AMMediaType newMediaType = null;
-            AudioStreamConfigCaps caps = new AudioStreamConfigCaps();
+            AudioStreamConfigCaps caps = new();
 
             // iterate through device's capabilities to find mediaType for desired capabilities
-            int capabilitiesCount;
-            streamConfig.GetNumberOfCapabilities(out capabilitiesCount, out _);
+            streamConfig.GetNumberOfCapabilities(out int capabilitiesCount, out _);
 
             for (int i = 0; i < capabilitiesCount; i++)
             {
                 try
                 {
-                    AudioCapabilities ac = new AudioCapabilities(streamConfig, i);
+                    AudioCapabilities ac = new(streamConfig, i);
 
                     if (capabilities == ac)
                     {

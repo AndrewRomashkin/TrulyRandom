@@ -10,16 +10,24 @@ namespace TrulyRandom
     /// </summary>
     public class DataSource
     {
+        /// <summary>
+        /// Number if bits currently available in the buffer
+        /// </summary>
         public int BitsAvailable => source.BytesInBuffer * 8 + buffer.Count;
 
-        List<bool> buffer = new List<bool>();
-        Module source;
+        readonly List<bool> buffer = new();
+        readonly Module source;
 
         internal DataSource(Module source)
         {
             this.source = source;
         }
 
+        /// <summary>
+        /// Gets a single random bit
+        /// </summary>
+        /// <returns>Random bit</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public bool GetBit()
         {
             lock (buffer)
@@ -45,16 +53,11 @@ namespace TrulyRandom
             }
         }
 
-        public byte[] GetBytes(int count)
-        {
-            byte[] data = source.ReadExactly(count);
-            if (data.Length != count)
-            {
-                throw new OutOfRandomnessException("Not enough randomness in the buffer");
-            }
-            return data;
-        }
-
+        /// <summary>
+        /// Gets a single random byte
+        /// </summary>
+        /// <returns>Random byte</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public byte GetByte()
         {
             byte[] data = source.ReadExactly(1);
@@ -65,21 +68,48 @@ namespace TrulyRandom
             return data[0];
         }
 
+        /// <summary>
+        /// Gets an array of random bytes
+        /// </summary>
+        /// <param name="count">Number of bytes</param>
+        /// <returns>Random bytes</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        public byte[] GetBytes(int count)
+        {
+            byte[] data = source.ReadExactly(count);
+            if (data.Length != count)
+            {
+                throw new OutOfRandomnessException("Not enough randomness in the buffer");
+            }
+            return data;
+        }
+
+        /// <summary>
+        /// Gets a random ULong
+        /// </summary>
+        /// <returns>Random ULong</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public ulong GetULong()
         {
             return GetULong(ulong.MaxValue);
         }
 
+        /// <summary>
+        /// Gets a random ULong in a range between 0 and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random ULong</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public ulong GetULong(ulong maxValue)
         {
-            //fast dice roller (FDR) algorithm
+            //Using FDR (Fast Dice Roller) algorithm
             lock (buffer)
             {
                 ulong v = 1, c = 0;
                 while (true)
                 {
-                    v = v << 1;
-                    c = c << 1;
+                    v <<= 1;
+                    c <<= 1;
                     if (GetBit())
                     {
                         c++;
@@ -97,6 +127,14 @@ namespace TrulyRandom
             }
         }
 
+        /// <summary>
+        /// Gets a random ULong in a range between <paramref name="minValue"/> and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="minValue">Lower bound (inclusive)</param>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random ULong</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        /// <exception cref="ArgumentException">Thrown if bounds are specified incorrectly</exception>
         public ulong GetULong(ulong minValue, ulong maxValue)
         {
             if (minValue >= maxValue)
@@ -106,11 +144,23 @@ namespace TrulyRandom
             return GetULong(maxValue - minValue) + minValue;
         }
 
+        /// <summary>
+        /// Gets a random long
+        /// </summary>
+        /// <returns>Random long</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public long GetLong()
         {
             return (long)GetULong(long.MaxValue);
         }
 
+        /// <summary>
+        /// Gets a random long in a range between 0 and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random long</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        /// <exception cref="ArgumentException">Thrown if bound is specified incorrectly</exception>
         public long GetLong(long maxValue)
         {
             if (maxValue <= 0)
@@ -120,6 +170,14 @@ namespace TrulyRandom
             return (long)GetULong((ulong)maxValue);
         }
 
+        /// <summary>
+        /// Gets a random long in a range between <paramref name="minValue"/> and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="minValue">Lower bound (inclusive)</param>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random long</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        /// <exception cref="ArgumentException">Thrown if bounds are specified incorrectly</exception>
         public long GetLong(long minValue, long maxValue)
         {
             if (minValue >= maxValue)
@@ -129,11 +187,22 @@ namespace TrulyRandom
             return (long)GetULong((ulong)(maxValue - minValue)) + minValue;
         }
 
+        /// <summary>
+        /// Gets a random UInt
+        /// </summary>
+        /// <returns>Random UInt</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public uint GetUInt()
         {
             return GetUInt(uint.MaxValue);
         }
 
+        /// <summary>
+        /// Gets a random UInt in a range between 0 and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random UInt</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public uint GetUInt(uint maxValue)
         {
             lock (buffer)
@@ -141,8 +210,8 @@ namespace TrulyRandom
                 uint v = 1, c = 0;
                 while (true)
                 {
-                    v = v << 1;
-                    c = c << 1;
+                    v <<= 1;
+                    c <<= 1;
                     if (GetBit())
                     {
                         c++;
@@ -160,6 +229,14 @@ namespace TrulyRandom
             }
         }
 
+        /// <summary>
+        /// Gets a random UInt in a range between <paramref name="minValue"/> and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="minValue">Lower bound (inclusive)</param>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random UInt</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        /// <exception cref="ArgumentException">Thrown if bounds are specified incorrectly</exception>
         public uint GetUInt(uint minValue, uint maxValue)
         {
             if (minValue >= maxValue)
@@ -169,11 +246,23 @@ namespace TrulyRandom
             return GetUInt(maxValue - minValue) + minValue;
         }
 
+        /// <summary>
+        /// Gets a random int
+        /// </summary>
+        /// <returns>Random int</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
         public int GetInt()
         {
             return (int)GetUInt(int.MaxValue);
         }
 
+        /// <summary>
+        /// Gets a random int in a range between 0 and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random int</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        /// <exception cref="ArgumentException">Thrown if bound is specified incorrectly</exception>
         public int GetInt(int maxValue)
         {
             if (maxValue <= 0)
@@ -183,6 +272,14 @@ namespace TrulyRandom
             return (int)GetUInt((uint)maxValue);
         }
 
+        /// <summary>
+        /// Gets a random int in a range between <paramref name="minValue"/> and <paramref name="maxValue"/>
+        /// </summary>
+        /// <param name="minValue">Lower bound (inclusive)</param>
+        /// <param name="maxValue">Upper bound (not inclusive)</param>
+        /// <returns>Random int</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        /// <exception cref="ArgumentException">Thrown if bounds are specified incorrectly</exception>
         public int GetInt(int minValue, int maxValue)
         {
             if (minValue >= maxValue)
@@ -192,15 +289,18 @@ namespace TrulyRandom
             return (int)GetUInt((uint)(maxValue - minValue)) + minValue;
         }
 
+        /// <summary>
+        /// Randomly shuffles specified array using Fisher–Yates algorithm
+        /// </summary>
+        /// <typeparam name="T">Type of an array element</typeparam>
+        /// <param name="array">Array to be shuffled</param>
         public void Shuffle<T>(T[] array)
         {
             uint n = (uint)array.Length;
             for (uint i = 0; i < (n - 1); i++)
             {
                 uint r = i + GetUInt(n - i);
-                T t = array[r];
-                array[r] = array[i];
-                array[i] = t;
+                (array[i], array[r]) = (array[r], array[i]);
             }
         }
     }

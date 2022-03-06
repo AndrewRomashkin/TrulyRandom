@@ -14,6 +14,11 @@
         /// </summary>
         public string MonikerString;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceDescriptor" /> class
+        /// </summary>
+        /// <param name="name">Device name</param>
+        /// <param name="monikerString">Unique device path</param>
         public DeviceDescriptor(string name, string monikerString)
         {
             Name = name;

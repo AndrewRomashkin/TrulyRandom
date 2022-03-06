@@ -10,7 +10,7 @@ namespace TrulyRandom.Models
     /// </summary>
     public abstract partial class Module : IDisposable
     {
-        CircularBuffer<byte> buffer = new CircularBuffer<byte>(10 * 1024 * 1024);
+        readonly CircularBuffer<byte> buffer = new(10 * 1024 * 1024);
 
         /// <summary>
         /// Main thread
@@ -174,7 +174,7 @@ namespace TrulyRandom.Models
         /// </summary>
         public double Entropy { get; private set; } = 0;
 
-        System.Timers.Timer timer = new System.Timers.Timer(100);
+        readonly System.Timers.Timer timer = new(100);
         /// <summary>
         /// Initializes a new instance of the <see cref="Module" /> class
         /// </summary>
@@ -201,9 +201,9 @@ namespace TrulyRandom.Models
             }
         }
 
-        List<(ulong Bytes, DateTime Time)> totalBytesGeneratedHistory = new List<(ulong Bytes, DateTime Time)>();
+        readonly List<(ulong Bytes, DateTime Time)> totalBytesGeneratedHistory = new();
         DateTime lastEntropyCalculation = DateTime.MinValue;
-        List<Interval> activityIntervals = new List<Interval>();
+        readonly List<Interval> activityIntervals = new();
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -290,11 +290,11 @@ namespace TrulyRandom.Models
                 DateTime start = activityIntervals[0].Start.Max(totalBytesGeneratedHistory[0].Time);
 
                 ulong bytesAtStart = 0;
-                foreach ((ulong Bytes, DateTime Time) item in totalBytesGeneratedHistory)
+                foreach ((ulong Bytes, DateTime Time) in totalBytesGeneratedHistory)
                 {
-                    if (item.Time >= start)
+                    if (Time >= start)
                     {
-                        bytesAtStart = item.Bytes;
+                        bytesAtStart = Bytes;
                         break;
                     }
                 }
@@ -308,10 +308,10 @@ namespace TrulyRandom.Models
                     }
                     if (interval.Start <= start)
                     {
-                        totalOperationalTime = totalOperationalTime + (interval.End.Min(DateTime.Now) - interval.Start);
+                        totalOperationalTime += interval.End.Min(DateTime.Now) - interval.Start;
                         continue;
                     }
-                    totalOperationalTime = totalOperationalTime + (interval.End.Min(DateTime.Now) - start);
+                    totalOperationalTime += interval.End.Min(DateTime.Now) - start;
                 }
 
                 if (totalOperationalTime.TotalSeconds == 0)
@@ -342,13 +342,13 @@ namespace TrulyRandom.Models
             byte[] result;
             if (buffer.Count < count)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             lock (Sync)
             {
                 if (buffer.Count < count)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
                 result = buffer.Read(count);
             }
@@ -369,13 +369,13 @@ namespace TrulyRandom.Models
             byte[] result;
             if (buffer.Count < count)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             lock (Sync)
             {
                 if (buffer.Count < count)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
                 result = buffer.ToArray();
                 buffer.Clear();
@@ -397,13 +397,13 @@ namespace TrulyRandom.Models
             byte[] result;
             if (!buffer.Any() || count <= 0)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             lock (Sync)
             {
                 if (!buffer.Any())
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
                 if (buffer.Count <= count)
                 {
@@ -430,7 +430,7 @@ namespace TrulyRandom.Models
             byte[] result;
             if (!buffer.Any())
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             lock (Sync)
             {
@@ -454,7 +454,7 @@ namespace TrulyRandom.Models
             }
         }
 
-        List<byte> lastData = new List<byte>();
+        readonly List<byte> lastData = new();
         DateTime lastDataAdded = DateTime.MinValue;
 
         /// <summary>
@@ -607,6 +607,7 @@ namespace TrulyRandom.Models
         /// </summary>
         public virtual void Dispose()
         {
+            GC.SuppressFinalize(this);
             timer.Stop();
             ManualRun = false;
             dispose = true;

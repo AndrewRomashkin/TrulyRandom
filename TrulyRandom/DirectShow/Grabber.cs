@@ -8,26 +8,33 @@ namespace TrulyRandom.DirectShow
     {
         public event Action<byte[]> NewData;
 
-        // Constructor
         public Grabber()
         {
         }
 
-        // Callback to receive samples
+        /// <summary>
+        /// Callback to receive samples
+        /// </summary>
+        /// <param name="sampleTime"></param>
+        /// <param name="sample"></param>
+        /// <returns></returns>
         public int SampleCB(double sampleTime, IntPtr sample)
         {
             return 0;
         }
 
-        // Callback method that receives a pointer to the sample buffer
+        /// <summary>
+        /// Callback method that receives a pointer to the sample buffer
+        /// </summary>
+        /// <param name="sampleTime"></param>
+        /// <param name="buffer"></param>
+        /// <param name="bufferLen"></param>
+        /// <returns></returns>
         public int BufferCB(double sampleTime, IntPtr buffer, int bufferLen)
         {
             byte[] result = new byte[bufferLen];
             Marshal.Copy(buffer, result, 0, bufferLen);
-            if (NewData != null)
-            {
-                NewData(result);
-            }
+            NewData?.Invoke(result);
             return 0;
         }
     }

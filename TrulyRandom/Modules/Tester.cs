@@ -4,26 +4,50 @@ using TrulyRandom.Models;
 
 namespace TrulyRandom.Modules
 {
+    /// <summary>
+    /// Applies NIST statistical tests to the data
+    /// </summary>
     public class Tester : Extractor
     {
-        List<NistTests.TestResult> testResultHistory = new List<NistTests.TestResult>();
-        NistTests tests { get; } = new NistTests();
+        readonly List<NistTests.FullTestResult> testResultHistory = new();
+        readonly NistTests tests = new();
 
+        /// <summary>
+        /// Parameters of the tests
+        /// </summary>
         public NistTests.TestParameters TestParameters => tests.Parameters;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tester" /> class
+        /// </summary>
         public Tester()
         {
             CalculateEntropy = false;
             BatchSize = 1_000_000;
         }
 
+        ///<inheritdoc/>
         protected override bool UseDefaultCompressionCalculator => true;
+        /// <summary>
+        /// Determines whether tests should be automatically selected based on the batch size
+        /// </summary>
         public bool AutoSelectTests { get; set; } = true;
+        /// <summary>
+        /// Determines whether data should be cropped to the size which was actually tested with all enabled tests
+        /// </summary>
         public bool OutputOnlyActuallyTestedBits { get; set; } = true;
+        /// <summary>
+        /// Determines whether failed batches should be discarded
+        /// </summary>
         public bool OutputOnlySuccessfullyTestedBits { get; set; } = true;
+        /// <summary>
+        /// Determines whether batches which failed <see cref="NistTests.TestsEnum.RandomExcursions"/> and <see cref="NistTests.TestsEnum.RandomExcursionsVariant"/> tests due to insufficient cycles should be merged and retested
+        /// </summary>
         public bool MergeAndRetestBlocksWithInsufficientCycles { get; set; } = false;
-
-        public NistTests.TestResult[] TestResultHistory
+        /// <summary>
+        /// Results of last tests performed
+        /// </summary>
+        public NistTests.FullTestResult[] TestResultHistory
         {
             get
             {
@@ -33,8 +57,10 @@ namespace TrulyRandom.Modules
                 }
             }
         }
-
-        public NistTests.TestResult LastTestResult
+        /// <summary>
+        /// Results of the last test performed
+        /// </summary>
+        public NistTests.FullTestResult LastTestResult
         {
             get
             {
@@ -44,7 +70,9 @@ namespace TrulyRandom.Modules
                 }
             }
         }
-
+        /// <summary>
+        /// Proportion of successful tests
+        /// </summary>
         public double SuccessRate
         {
             get
@@ -63,7 +91,7 @@ namespace TrulyRandom.Modules
                 }
             }
         }
-
+        ///<inheritdoc/>
         protected override int GetActualBatchSize()
         {
             return BatchSize;
@@ -71,8 +99,10 @@ namespace TrulyRandom.Modules
 
         byte[] insufficientCyclePool = null;
 
+        ///<inheritdoc/>
         protected override byte[] ProcessData(byte[] data)
         {
+            //Autoselecting tests based on batch size
             if (AutoSelectTests)
             {
                 NistTests.TestsEnum testsForThisSize = NistTests.TestParameters.TestsForSize(data.Length * 8);
@@ -80,27 +110,28 @@ namespace TrulyRandom.Modules
 
                 if (testsForThisSize == NistTests.TestsEnum.None)
                 {
-                    return new byte[0];
+                    return System.Array.Empty<byte>();
                 }
             }
 
-            NistTests.TestResult testResult = tests.Perform(data);
+            NistTests.FullTestResult testResult = tests.Perform(data);
 
             if (MergeAndRetestBlocksWithInsufficientCycles && testResult.InsufficientCycles)
             {
                 if (insufficientCyclePool == null)
                 {
                     insufficientCyclePool = data;
-                    return new byte[0];
+                    return System.Array.Empty<byte>();
                 }
                 else
                 {
+                    //Merging batches with insufficient cycles into one pool
                     data = insufficientCyclePool.Concat(data);
                     insufficientCyclePool = null;
                     NistTests.TestsEnum testsToPerform = tests.Parameters.TestsToPerform & (NistTests.TestsEnum.RandomExcursions | NistTests.TestsEnum.RandomExcursionsVariant);
                     if (testsToPerform == NistTests.TestsEnum.None)
                     {
-                        return new byte[0];
+                        return System.Array.Empty<byte>();
                     }
                     testResult = tests.Perform(data, testsToPerform);
 
@@ -116,7 +147,7 @@ namespace TrulyRandom.Modules
                             insufficientCyclePool = data;
                         }
 
-                        return new byte[0];
+                        return System.Array.Empty<byte>();
                     }
                 }
             }
@@ -132,7 +163,7 @@ namespace TrulyRandom.Modules
 
             if (!testResult.Success && OutputOnlySuccessfullyTestedBits)
             {
-                return new byte[0];
+                return System.Array.Empty<byte>();
             }
             if (OutputOnlyActuallyTestedBits)
             {

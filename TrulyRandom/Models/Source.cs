@@ -1,7 +1,7 @@
 ﻿namespace TrulyRandom.Models
 {
     /// <summary>
-    /// Base class for all sources - modules that get data from the physical world and feed it to extractors
+    /// Base class for all sources - modules that retrieve entropy from the physical world and feed it to extractors
     /// </summary>
     public abstract class Source : Module
     {

@@ -32,7 +32,7 @@ namespace TrulyRandom.Modules.Extractors
         ///<inheritdoc/>
         protected override byte[] ProcessData(byte[] data)
         {
-            MemoryStream stream = new MemoryStream();
+            MemoryStream stream = new();
 
             CompressionLevel adjustedCompressionLevel = CompressionLevel;
             if (DynamicCoefficient > 0.5)
@@ -40,7 +40,7 @@ namespace TrulyRandom.Modules.Extractors
                 adjustedCompressionLevel = CompressionLevel.Optimal;
             }
 
-            using (DeflateStream deflateStream = new DeflateStream(stream, adjustedCompressionLevel))
+            using (DeflateStream deflateStream = new(stream, adjustedCompressionLevel))
             {
                 deflateStream.Write(data, 0, data.Length);
             }

@@ -11,9 +11,7 @@ namespace TrulyRandom.DirectShow
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterInfoCollection"/> class.
         /// </summary>
-        /// 
-        /// <param name="category">Guid of DirectShow filter category. See <see cref="FilterCategory"/>.</param>
-        /// 
+        /// <param name="category">Guid of DirectShow filter category</param>
         /// <remarks>Build collection of filters' information objects for the
         /// specified filter category.</remarks>
         /// 
@@ -36,7 +34,7 @@ namespace TrulyRandom.DirectShow
         private void CollectFilters(Guid category)
         {
             object comObj = null;
-            ICreateDevEnum enumDev = null;
+            ICreateDevEnum enumDev;
             IEnumMoniker enumMon = null;
             IMoniker[] devMon = new IMoniker[1];
             int hr;
@@ -73,7 +71,7 @@ namespace TrulyRandom.DirectShow
                     }
 
                     // Add the filter
-                    FilterInfo filter = new FilterInfo(devMon[0]);
+                    FilterInfo filter = new(devMon[0]);
                     InnerList.Add(filter);
 
                     // Release COM object

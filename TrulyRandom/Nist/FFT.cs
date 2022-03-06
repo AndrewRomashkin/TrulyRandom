@@ -11,7 +11,8 @@ namespace TrulyRandom.Nist
         /// <summary>
         /// Applies Bluestein's FFT algorithm to the array
         /// </summary>
-        /// <param name="samples"></param>
+        /// <param name="samples">Data to be converted to a frequency domain</param>
+        /// <param name="threads">Maximum threads to be utilized</param>
         public static void Apply(Complex[] samples, int threads)
         {
             DateTime lastBreak = DateTime.Now;
@@ -73,9 +74,9 @@ namespace TrulyRandom.Nist
 
 
         /// <summary>
-        /// Generate the bluestein sequence for the provided problem size.
+        /// Generate the bluestein sequence for the provided problem size
         /// </summary>
-        /// <param name="n">Number of samples.</param>
+        /// <param name="n">Number of samples</param>
         /// <returns>Bluestein sequence exp(I*Pi*k^2/N)</returns>
         static Complex[] BluesteinSequence(int n)
         {
@@ -92,11 +93,10 @@ namespace TrulyRandom.Nist
         }
 
         /// <summary>
-        /// Find the closest perfect power of two that is larger or equal to the provided
-        /// 32 bit integer.
+        /// Find the closest perfect power of two that is larger or equal to the provided 32 bit integer
         /// </summary>
-        /// <param name="number">The number of which to find the closest upper power of two.</param>
-        /// <returns>A power of two.</returns>
+        /// <param name="number">The number of which to find the closest upper power of two</param>
+        /// <returns>A power of two</returns>
         /// <exception cref="ArgumentOutOfRangeException"/>
         static int CeilingToPowerOfTwo(this int number)
         {
@@ -141,21 +141,6 @@ namespace TrulyRandom.Nist
         }
 
         /// <summary>
-        /// Radix-2 generic FFT for power-of-two sized sample vectors.
-        /// </summary>
-        static void Radix2Inverse(Complex[] data)
-        {
-            Radix2Reorder(data);
-            for (int levelSize = 1; levelSize < data.Length; levelSize *= 2)
-            {
-                for (int k = 0; k < levelSize; k++)
-                {
-                    Radix2Step(data, 1, levelSize, k);
-                }
-            }
-        }
-
-        /// <summary>
         /// Radix-2 generic FFT for power-of-two sample vectors (Parallel Version).
         /// </summary>
         static void Radix2InverseParallel(Complex[] data, int threads)
@@ -191,9 +176,7 @@ namespace TrulyRandom.Nist
             {
                 if (i < j)
                 {
-                    T temp = samples[i];
-                    samples[i] = samples[j];
-                    samples[j] = temp;
+                    (samples[j], samples[i]) = (samples[i], samples[j]);
                 }
 
                 int m = samples.Length;
@@ -209,7 +192,7 @@ namespace TrulyRandom.Nist
 
 
         /// <summary>
-        /// Radix-2 Step Helper Method
+        /// Radix-2 Step helper method
         /// </summary>
         /// <param name="samples">Sample vector.</param>
         /// <param name="exponentSign">Fourier series exponent sign.</param>
@@ -222,7 +205,7 @@ namespace TrulyRandom.Nist
         {
             // Twiddle Factor
             double exponent = exponentSign * k * Math.PI / levelSize;
-            Complex w = new Complex((float)Math.Cos(exponent), (float)Math.Sin(exponent));
+            Complex w = new((float)Math.Cos(exponent), (float)Math.Sin(exponent));
 
             int step = levelSize << 1;
             for (int i = k; i < samples.Length; i += step)

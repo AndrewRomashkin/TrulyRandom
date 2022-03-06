@@ -6,22 +6,25 @@ using TrulyRandom.Modules.Sources;
 
 namespace UnitTests
 {
+    /// <summary>
+    /// Evaluates the functionality of the complete graphs with the different kinds of sources. May take a long time to run
+    /// </summary>
     [TestClass]
     public class CompleteGraphs
     {
         [TestMethod]
         public void Video()
         {
-            VideoSource source = new VideoSource();
-            DeflateExtractor deflateExtractor = new DeflateExtractor();
+            VideoSource source = new();
+            DeflateExtractor deflateExtractor = new();
             deflateExtractor.AddSource(source);
-            ShuffleExtractor shuffleExtractor = new ShuffleExtractor();
+            ShuffleExtractor shuffleExtractor = new();
             shuffleExtractor.AddSource(deflateExtractor);
-            HashExtractor hashExtractor = new HashExtractor();
+            HashExtractor hashExtractor = new();
             hashExtractor.AddSource(shuffleExtractor);
-            Tester tester = new Tester();
+            Tester tester = new();
             tester.AddSource(hashExtractor);
-            TrulyRandom.Modules.Buffer buffer = new TrulyRandom.Modules.Buffer();
+            Buffer buffer = new();
             buffer.AddSource(tester);
 
             deflateExtractor.DynamicCoefficientSource = buffer;
@@ -56,16 +59,16 @@ namespace UnitTests
         [TestMethod]
         public void Audio()
         {
-            AudioSource source = new AudioSource();
-            DeflateExtractor deflateExtractor = new DeflateExtractor();
+            AudioSource source = new();
+            DeflateExtractor deflateExtractor = new();
             deflateExtractor.AddSource(source);
-            ShuffleExtractor shuffleExtractor = new ShuffleExtractor();
+            ShuffleExtractor shuffleExtractor = new();
             shuffleExtractor.AddSource(deflateExtractor);
-            HashExtractor hashExtractor = new HashExtractor();
+            HashExtractor hashExtractor = new();
             hashExtractor.AddSource(shuffleExtractor);
-            Tester tester = new Tester();
+            Tester tester = new();
             tester.AddSource(hashExtractor);
-            TrulyRandom.Modules.Buffer buffer = new TrulyRandom.Modules.Buffer();
+            TrulyRandom.Modules.Buffer buffer = new();
             buffer.AddSource(tester);
 
             deflateExtractor.DynamicCoefficientSource = buffer;
@@ -100,19 +103,19 @@ namespace UnitTests
         [TestMethod]
         public void Biological()
         {
-            BiologicalSource source = new BiologicalSource();
-            DeflateExtractor deflateExtractor = new DeflateExtractor();
+            BiologicalSource source = new();
+            DeflateExtractor deflateExtractor = new();
             deflateExtractor.AddSource(source);
-            ShuffleExtractor shuffleExtractor = new ShuffleExtractor();
+            ShuffleExtractor shuffleExtractor = new();
             shuffleExtractor.BatchSize = 10000;
             shuffleExtractor.BlockSize = 100;
             shuffleExtractor.AddSource(deflateExtractor);
-            HashExtractor hashExtractor = new HashExtractor();
+            HashExtractor hashExtractor = new();
             hashExtractor.AddSource(shuffleExtractor);
-            Tester tester = new Tester();
+            Tester tester = new();
             tester.BatchSize = 1000;
             tester.AddSource(hashExtractor);
-            TrulyRandom.Modules.Buffer buffer = new TrulyRandom.Modules.Buffer();
+            Buffer buffer = new();
             buffer.BufferSize = 100000;
             buffer.AddSource(tester);
 
@@ -150,20 +153,20 @@ namespace UnitTests
         [TestMethod]
         public void All()
         {
-            AudioSource audioSource = new AudioSource();
-            VideoSource videoSource = new VideoSource();
-            BiologicalSource biologicalSource = new BiologicalSource();
-            DeflateExtractor deflateExtractor = new DeflateExtractor();
+            AudioSource audioSource = new();
+            VideoSource videoSource = new();
+            BiologicalSource biologicalSource = new();
+            DeflateExtractor deflateExtractor = new();
             deflateExtractor.AddSource(audioSource);
             deflateExtractor.AddSource(videoSource);
             deflateExtractor.AddSource(biologicalSource);
-            ShuffleExtractor shuffleExtractor = new ShuffleExtractor();
+            ShuffleExtractor shuffleExtractor = new();
             shuffleExtractor.AddSource(deflateExtractor);
-            HashExtractor hashExtractor = new HashExtractor();
+            HashExtractor hashExtractor = new();
             hashExtractor.AddSource(shuffleExtractor);
-            Tester tester = new Tester();
+            Tester tester = new();
             tester.AddSource(hashExtractor);
-            TrulyRandom.Modules.Buffer buffer = new TrulyRandom.Modules.Buffer();
+            Buffer buffer = new();
             buffer.AddSource(tester);
 
             deflateExtractor.DynamicCoefficientSource = buffer;

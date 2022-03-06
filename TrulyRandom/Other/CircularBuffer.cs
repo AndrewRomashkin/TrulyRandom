@@ -5,54 +5,43 @@ using System.Linq;
 
 namespace TrulyRandom
 {
-    //Author: joaoportela
-    /// <inheritdoc/>
+    //Based on joaoportela's code
     /// <summary>
-    /// Circular buffer.
+    /// Circular buffer optimized for frequent additions and removals of data
     /// </summary>
     internal class CircularBuffer<T> : IEnumerable<T>
     {
         private T[] buffer;
 
         /// <summary>
-        /// The _start. Index of the first element in buffer.
+        /// Index of the first element in buffer
         /// </summary>
         private int start;
 
         /// <summary>
-        /// The _end. Index after the last element in the buffer.
+        /// Index after the last element in the buffer
         /// </summary>
         private int end;
 
         /// <summary>
-        /// The _size. Buffer size.
+        /// Buffer size
         /// </summary>
         private int count;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CircularBuffer{T}"/> class.
-        /// 
+        /// Initializes a new instance of the <see cref="CircularBuffer{T}"/> class
         /// </summary>
-        /// <param name='capacity'>
-        /// Buffer capacity. Must be positive.
-        /// </param>
+        /// <param name='capacity'>Buffer capacity</param>
         public CircularBuffer(int capacity)
-            : this(capacity, new T[] { })
+            : this(capacity, Array.Empty<T>())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CircularBuffer{T}"/> class.
-        /// 
+        /// Initializes a new instance of the <see cref="CircularBuffer{T}"/> class
         /// </summary>
-        /// <param name='capacity'>
-        /// Buffer capacity. Must be positive.
-        /// </param>
-        /// <param name='items'>
-        /// Items to fill buffer with. Items length must be less than capacity.
-        /// Suggestion: use Skip(x).Take(y).ToArray() to build this argument from
-        /// any enumerable.
-        /// </param>
+        /// <param name='capacity'> Buffer capacity</param>
+        /// <param name='items'> Items to fill buffer with</param>
         public CircularBuffer(int capacity, T[] items)
         {
             if (capacity < 1)
@@ -81,7 +70,7 @@ namespace TrulyRandom
 
         /// <summary>
         /// Maximum capacity of the buffer. Elements pushed into the buffer after
-        /// maximum capacity is reached (IsFull = true), will remove an element.
+        /// maximum capacity is reached (IsFull = true), will remove an element
         /// </summary>
         public int Capacity
         {
@@ -96,15 +85,12 @@ namespace TrulyRandom
         }
 
         /// <summary>
-        /// Boolean indicating if Circular is at full capacity.
-        /// Adding more elements when the buffer is full will
-        /// cause elements to be removed from the other end
-        /// of the buffer.
+        ///Shows whether buffer is full
         /// </summary>
         public bool IsFull => Count == Capacity;
 
         /// <summary>
-        /// True if has no elements.
+        /// Shows whether buffer is empty
         /// </summary>
         public bool IsEmpty => Count == 0;
 
@@ -114,9 +100,9 @@ namespace TrulyRandom
         public int Count => count;
 
         /// <summary>
-        /// First element of the buffer - this[0].
+        /// First element of the buffer
         /// </summary>
-        /// <returns>The value of the element of type T at the front of the buffer.</returns>
+        /// <returns>The value of the first element of the buffer</returns>
         T First()
         {
             ThrowIfEmpty();
@@ -124,12 +110,10 @@ namespace TrulyRandom
         }
 
         /// <summary>
-        /// Index access to elements in buffer.
-        /// Index does not loop around like when adding elements,
-        /// valid interval is [0;Size[
+        /// Index access to elements in buffer
         /// </summary>
-        /// <param name="index">Index of element to access.</param>
-        /// <exception cref="IndexOutOfRangeException">Thrown when index is outside of [; Size[ interval.</exception>
+        /// <param name="index">Index of element to access</param>
+        /// <exception cref="IndexOutOfRangeException">Thrown when index is outside of [0; Count] interval.</exception>
         public T this[int index]
         {
             get
@@ -162,7 +146,6 @@ namespace TrulyRandom
 
         /// <summary>
         /// Adds a new element to the end of the buffer
-        /// 
         /// When the buffer is full, the first element will be removed to allow for new element to fit
         /// </summary>
         /// <param name="item">Item to add</param>
@@ -184,7 +167,6 @@ namespace TrulyRandom
 
         /// <summary>
         /// Adds several elements to the end of the buffer
-        /// 
         /// When the buffer is full, first elements will be removed to allow for new elements to fit
         /// </summary>
         /// <param name="items">Items to add</param>
@@ -239,12 +221,13 @@ namespace TrulyRandom
         /// <summary>
         /// Reads and removes first <code>count</code> elements of the buffer
         /// </summary>
+        /// <param name="count">Count of elements to be removed</param>
         public T[] Read(int count)
         {
             int actualCount = Math.Min(count, this.count);
             if (actualCount == 0)
             {
-                return new T[0];
+                return Array.Empty<T>();
             }
             T[] result = new T[actualCount];
 
@@ -283,9 +266,7 @@ namespace TrulyRandom
         }
 
         /// <summary>
-        /// Copies the buffer contents to an array, according to the logical
-        /// contents of the buffer (i.e. independent of the internal 
-        /// order/contents)
+        /// Copies the buffer contents to an array
         /// </summary>
         /// <returns>A new array with a copy of the buffer contents.</returns>
         public T[] ToArray()
@@ -390,7 +371,7 @@ namespace TrulyRandom
         {
             if (IsEmpty)
             {
-                return new ArraySegment<T>(new T[0]);
+                return new ArraySegment<T>(Array.Empty<T>());
             }
             else if (start < end)
             {
@@ -406,7 +387,7 @@ namespace TrulyRandom
         {
             if (IsEmpty)
             {
-                return new ArraySegment<T>(new T[0]);
+                return new ArraySegment<T>(Array.Empty<T>());
             }
             else if (start < end)
             {

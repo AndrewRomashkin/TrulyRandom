@@ -7,6 +7,9 @@ using TrulyRandom.Modules.Sources;
 
 namespace UnitTests
 {
+    /// <summary>
+    /// Evaluates the functionality of different sources
+    /// </summary>
     [TestClass]
     public class Sources
     {
@@ -20,7 +23,7 @@ namespace UnitTests
         [TestMethod]
         public void Video()
         {
-            VideoSource source = new VideoSource();
+            VideoSource source = new();
             source.Start();
             source.BufferSize = 100_000_000;  //To ensure buffer won't overflow after 2 frames
             bool success = false;
@@ -41,7 +44,7 @@ namespace UnitTests
         [TestMethod]
         public void Audio()
         {
-            AudioSource source = new AudioSource();
+            AudioSource source = new();
             source.Start();
             bool success = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(10)))
@@ -62,7 +65,7 @@ namespace UnitTests
         [Description("You need to wiggle your mouse and/or press keyboard keys while this test is running!!!")]
         public void Biological()
         {
-            BiologicalSource source = new BiologicalSource();
+            BiologicalSource source = new();
             source.Start();
             bool success = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(30)))
@@ -100,7 +103,7 @@ namespace UnitTests
         {
             bool success = false;
             TrulyRandom.Devices.DeviceDescriptor deviceDescriptor = VideoSource.AvailableDevices[0];
-            VideoSource source = new VideoSource(deviceDescriptor);
+            VideoSource source = new(deviceDescriptor);
             VideoSource source1;
             try
             {

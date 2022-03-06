@@ -36,7 +36,7 @@ namespace TrulyRandom.Devices
         /// <summary>
         /// Unique device path
         /// </summary>
-        string monikerString;
+        readonly string monikerString;
         /// <summary>
         /// Main thread of the object
         /// </summary>
@@ -120,6 +120,7 @@ namespace TrulyRandom.Devices
         /// </summary>
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             dispose = true;
             if (thread == null || thread.ThreadState == ThreadState.Unstarted)
             {
@@ -133,15 +134,15 @@ namespace TrulyRandom.Devices
         /// <summary>
         /// Stores a list of moniker strings of all devices currently used by any instance of this object
         /// </summary>
-        static List<string> devicesInUse = new List<string>();
+        static readonly List<string> devicesInUse = new();
 
         /// <summary>
         /// Returns all device descriptors of given type currently available in the system
         /// </summary>
         protected static DeviceDescriptor[] GetAvailableDevices(Guid deviceType)
         {
-            List<DeviceDescriptor> result = new List<DeviceDescriptor>();
-            FilterInfoCollection devices = new FilterInfoCollection(deviceType);
+            List<DeviceDescriptor> result = new();
+            FilterInfoCollection devices = new(deviceType);
             lock (devicesInUse)
             {
                 for (int i = 0; i < devices.Count; i++)
@@ -279,7 +280,7 @@ namespace TrulyRandom.Devices
             {
                 throw new ArgumentException("This device is already in use");
             }
-            thread = new Thread(new ThreadStart(WorkerThread));
+            thread = new(new ThreadStart(WorkerThread));
             thread.Name = GetThreadName();
         }
 
@@ -295,7 +296,7 @@ namespace TrulyRandom.Devices
         /// </summary>
         void WorkerThread()
         {
-            Grabber grabber = new Grabber();
+            Grabber grabber = new();
             object captureGraphObject = null;
             object graphObject = null;
             object grabberObject = null;
@@ -394,15 +395,12 @@ namespace TrulyRandom.Devices
 
                         //Run
                         mediaControl.Run();
-
-                        IntPtr p1, p2;
-                        DsEvCode code;
-
                         while (!dispose && run)
                         {
                             if (mediaEvent != null)
                             {
-                                if (mediaEvent.GetEvent(out code, out p1, out p2, 0) >= 0)
+
+                                if (mediaEvent.GetEvent(out DsEvCode code, out IntPtr p1, out IntPtr p2, 0) >= 0)
                                 {
                                     mediaEvent.FreeEventParams(code, p1, p2);
 
@@ -431,10 +429,7 @@ namespace TrulyRandom.Devices
                 catch (Exception e)
                 {
                     lastException = e;
-                    if (NewException != null)
-                    {
-                        NewException(e);
-                    }
+                    NewException?.Invoke(e);
                     Thread.Sleep(5000);
                 }
                 finally
@@ -464,9 +459,9 @@ namespace TrulyRandom.Devices
         }
 
         byte[] lastData = null;
-        object grabberSync = new object();
-        List<double> sampleIntervals = new List<double>();
-        List<int> sampleSizes = new List<int>();
+        readonly object grabberSync = new();
+        readonly List<double> sampleIntervals = new();
+        readonly List<int> sampleSizes = new();
         DateTime? lastDataRecieved = null;
 
         /// <summary>

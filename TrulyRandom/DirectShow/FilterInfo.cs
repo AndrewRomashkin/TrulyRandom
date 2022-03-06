@@ -79,13 +79,11 @@ namespace TrulyRandom.DirectShow
             int n = 0;
 
             // bind context and moniker objects
-            IBindCtx bindCtx;
             // create bind context
-            if (Win32.CreateBindCtx(0, out bindCtx) == 0)
+            if (Win32.CreateBindCtx(0, out IBindCtx bindCtx) == 0)
             {
-                IMoniker moniker;
                 // convert moniker`s string to a moniker
-                if (Win32.MkParseDisplayName(bindCtx, filterMoniker, ref n, out moniker) == 0)
+                if (Win32.MkParseDisplayName(bindCtx, filterMoniker, ref n, out IMoniker moniker) == 0)
                 {
                     // get device base filter
                     Guid filterId = typeof(IBaseFilter).GUID;
@@ -101,17 +99,16 @@ namespace TrulyRandom.DirectShow
         //
         // Get moniker string of the moniker
         //
-        private string GetMonikerString(IMoniker moniker)
+        private static string GetMonikerString(IMoniker moniker)
         {
-            string str;
-            moniker.GetDisplayName(null, null, out str);
+            moniker.GetDisplayName(null, null, out string str);
             return str;
         }
 
         //
         // Get filter name represented by the moniker
         //
-        private string GetName(IMoniker moniker)
+        private static string GetName(IMoniker moniker)
         {
             object bagObj = null;
             try
@@ -155,18 +152,16 @@ namespace TrulyRandom.DirectShow
         //
         // Get filter name represented by the moniker string
         //
-        private string GetName(string monikerString)
+        private static string GetName(string monikerString)
         {
             string name = "";
             int n = 0;
 
-            IBindCtx bindCtx;
             // create bind context
-            if (Win32.CreateBindCtx(0, out bindCtx) == 0)
+            if (Win32.CreateBindCtx(0, out IBindCtx bindCtx) == 0)
             {
-                IMoniker moniker;
                 // convert moniker`s string to a moniker
-                if (Win32.MkParseDisplayName(bindCtx, monikerString, ref n, out moniker) == 0)
+                if (Win32.MkParseDisplayName(bindCtx, monikerString, ref n, out IMoniker moniker) == 0)
                 {
                     // get device name
                     name = GetName(moniker);

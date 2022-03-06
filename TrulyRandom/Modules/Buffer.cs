@@ -7,21 +7,52 @@ using TrulyRandom.Models;
 
 namespace TrulyRandom.Modules
 {
+    /// <summary>
+    /// Allows for data storage both in the output buffer and on the disk
+    /// </summary>
     public class Buffer : Module
     {
-        public Module[] Sources { get; set; } = new Module[0];
-        public int BufferFileSize { get; set; } = 1000000;
+        /// <summary>
+        /// Sources of data for this buffer
+        /// </summary>
+        public Module[] Sources { get; set; } = Array.Empty<Module>();
+        /// <summary>
+        /// Size of each of the files stored on the disk
+        /// </summary>
+        public int BufferFileSize { get; set; } = 1_000_000;
+        /// <summary>
+        /// Maximum number of files to store on the disk (0 to disable disk storage)
+        /// </summary>
         public int MaxFilesToStore { get; set; } = 0;
-        public int MinBytesInBuffer { get; set; } = 100000;
+        /// <summary>
+        /// If number of bytes in the buffer is lower than this amount - data will be loaded from the disk
+        /// </summary>
+        public int MinBytesInBuffer { get; set; } = 100_000;
+        /// <summary>
+        /// If number of bytes in the buffer is higher than this amount - data will be saved to the disk
+        /// </summary>
+        public int MaxBytesInBuffer { get; set; } = 2_000_000;
+        /// <summary>
+        /// Directory in which buffer files will be located
+        /// </summary>
         public string BufferDirectory = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "RandomnessBuffer";
+        /// <summary>
+        /// Determines whether data block should be taken from all available sources and concatenated (<c>true</c>), or from one source if possible (<c>false</c>)
+        /// </summary>
         public bool MixDataFromDifferentSources { get; set; } = true;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Buffer" /> class
+        /// </summary>
         public Buffer()
         {
             thread = new Thread(WorkerThread);
             thread.Name = Name;
         }
 
+        /// <summary>
+        /// Main loop
+        /// </summary>
         void WorkerThread()
         {
             while (!dispose)
@@ -41,18 +72,21 @@ namespace TrulyRandom.Modules
                     }
                 }
 
-                SaveToBuffer();
-                LoadFromBuffer();
+                SaveToDisk();
+                LoadFromDisk();
                 Thread.Sleep(1);
             }
             Disposed = true;
         }
 
-        object directoryLock = new object();
+        readonly object directoryLock = new();
         DateTime nextWriteCheck = DateTime.Now;
-        void SaveToBuffer()
+        /// <summary>
+        /// Saves exccess data to the disk
+        /// </summary>
+        void SaveToDisk()
         {
-            if (DateTime.Now < nextWriteCheck || BytesInBuffer < MinBytesInBuffer + BufferFileSize)
+            if (DateTime.Now < nextWriteCheck || BytesInBuffer < MaxBytesInBuffer)
             {
                 return;
             }
@@ -63,11 +97,10 @@ namespace TrulyRandom.Modules
                     Directory.CreateDirectory(BufferDirectory);
                     while (BytesInBuffer >= MinBytesInBuffer + BufferFileSize)
                     {
-                        List<int> files = new List<int>();
+                        List<int> files = new();
                         foreach (string file in Directory.GetFiles(BufferDirectory))
                         {
-                            int number;
-                            if (int.TryParse(Path.GetFileName(file), out number))
+                            if (int.TryParse(Path.GetFileName(file), out int number))
                             {
                                 files.Add(number);
                             }
@@ -110,7 +143,10 @@ namespace TrulyRandom.Modules
         }
 
         DateTime nextReadCheck = DateTime.MinValue;
-        void LoadFromBuffer()
+        /// <summary>
+        /// Loads insufficient data from buffer files
+        /// </summary>
+        void LoadFromDisk()
         {
             if (DateTime.Now < nextReadCheck || BytesInBuffer >= MinBytesInBuffer)
             {
@@ -125,11 +161,10 @@ namespace TrulyRandom.Modules
                 }
                 while (BytesInBuffer < MinBytesInBuffer)
                 {
-                    List<int> files = new List<int>();
+                    List<int> files = new();
                     foreach (string file in Directory.GetFiles(BufferDirectory))
                     {
-                        int number;
-                        if (int.TryParse(Path.GetFileName(file), out number))
+                        if (int.TryParse(Path.GetFileName(file), out int number))
                         {
                             files.Add(number);
                         }
@@ -155,7 +190,10 @@ namespace TrulyRandom.Modules
             }
         }
 
-        public void ClearBufferedData()
+        /// <summary>
+        /// Deletes data stored on the disk
+        /// </summary>
+        public void ClearDiskData()
         {
             lock (directoryLock)
             {
@@ -174,6 +212,10 @@ namespace TrulyRandom.Modules
             }
         }
 
+        /// <summary>
+        /// Gets the number of buffer files available on the disk
+        /// </summary>
+        /// <returns>Number of files available</returns>
         public int GetNumberOfDataFilesAvailable()
         {
             lock (directoryLock)
@@ -185,8 +227,7 @@ namespace TrulyRandom.Modules
                 int result = 0;
                 foreach (string file in Directory.GetFiles(BufferDirectory))
                 {
-                    int number;
-                    if (int.TryParse(Path.GetFileName(file), out number))
+                    if (int.TryParse(Path.GetFileName(file), out int number))
                     {
                         result++;
                     }
@@ -195,15 +236,19 @@ namespace TrulyRandom.Modules
             }
         }
 
+        /// <summary>
+        /// Reads data from sources
+        /// </summary>
+        /// <returns>Data read</returns>
         byte[] ReadDataFromSources()
         {
             Module[] sources = Sources;
             if (sources.Length == 0)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
 
-            List<Module> lockedSources = new List<Module>();
+            List<Module> lockedSources = new();
             try
             {
                 foreach (Module source in sources)
@@ -216,7 +261,7 @@ namespace TrulyRandom.Modules
 
                 if (!lockedSources.Any())
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
 
                 int bytesToRead = BufferSize - BytesInBuffer;
@@ -225,7 +270,7 @@ namespace TrulyRandom.Modules
 
                 if (bytesAvailable == 0)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
 
                 if (bytesAvailable <= bytesToRead)
@@ -254,7 +299,7 @@ namespace TrulyRandom.Modules
 
                 if (data.Sum(x => x.Length) == 0)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
 
                 if (MixDataFromDifferentSources)
@@ -266,7 +311,7 @@ namespace TrulyRandom.Modules
             }
             catch
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             finally
             {
@@ -277,6 +322,10 @@ namespace TrulyRandom.Modules
             }
         }
 
+        /// <summary>
+        /// Adds source to read data from
+        /// </summary>
+        /// <param name="source"></param>
         public void AddSource(Module source)
         {
             if (Sources.Contains(source))
@@ -286,6 +335,10 @@ namespace TrulyRandom.Modules
             Sources = Sources.Append(source);
         }
 
+        /// <summary>
+        /// Removes source from the list
+        /// </summary>
+        /// <param name="source">Source to be removed</param>
         public void RemoveSource(Module source)
         {
             if (Sources.Contains(source))

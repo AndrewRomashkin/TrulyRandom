@@ -7,9 +7,6 @@ namespace TrulyRandom.DirectShow
 {
     class AudioCapabilities
     {
-        /// <summary>
-        /// Average frame rate of video device for corresponding <see cref="FrameSize">frame size</see>.
-        /// </summary>
         public readonly int Channels;
         public readonly int SamplesPerSec;
         public readonly int AvgBytesPerSec;
@@ -18,17 +15,22 @@ namespace TrulyRandom.DirectShow
 
         internal AudioCapabilities() { }
 
-        // Retrieve capabilities of a audio device
+        /// <summary>
+        /// Retrieves capabilities of an audio device
+        /// </summary>
+        /// <param name="audioStreamConfig"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="NotSupportedException"></exception>
         internal static AudioCapabilities[] FromStreamConfig(IAMStreamConfig_Audio audioStreamConfig)
         {
             if (audioStreamConfig == null)
             {
-                throw new ArgumentNullException("audioStreamConfig");
+                throw new ArgumentNullException(nameof(audioStreamConfig));
             }
 
-            // ensure this device reports capabilities
-            int count, size;
-            int hr = audioStreamConfig.GetNumberOfCapabilities(out count, out size);
+            //Ensure this device reports capabilities
+            int hr = audioStreamConfig.GetNumberOfCapabilities(out int count, out int size);
 
             if (hr != 0)
             {
@@ -45,14 +47,14 @@ namespace TrulyRandom.DirectShow
                 throw new NotSupportedException("Unable to retrieve audio device capabilities. This audio device requires a larger AudioStreamConfigCaps structure.");
             }
 
-            // group capabilities with similar parameters
-            Dictionary<int, AudioCapabilities> audiocapsList = new Dictionary<int, AudioCapabilities>();
+            //Group capabilities with similar parameters
+            Dictionary<int, AudioCapabilities> audiocapsList = new();
 
             for (int i = 0; i < count; i++)
             {
                 try
                 {
-                    AudioCapabilities ac = new AudioCapabilities(audioStreamConfig, i);
+                    AudioCapabilities ac = new(audioStreamConfig, i);
 
                     int key = ac.Channels + ac.BlockAlign + ac.BitsPerSample + ac.AvgBytesPerSec + ac.SamplesPerSec;
 
@@ -79,15 +81,20 @@ namespace TrulyRandom.DirectShow
             return audiocaps;
         }
 
-        // Retrieve capabilities of a audio device
+        /// <summary>
+        /// Retrieves capabilities of an audio device
+        /// </summary>
+        /// <param name="audioStreamConfig"></param>
+        /// <param name="index"></param>
+        /// <exception cref="ApplicationException"></exception>
         internal AudioCapabilities(IAMStreamConfig_Audio audioStreamConfig, int index)
         {
             AMMediaType mediaType = null;
-            AudioStreamConfigCaps caps = new AudioStreamConfigCaps();
+            AudioStreamConfigCaps caps = new();
 
             try
             {
-                // retrieve capabilities struct at the specified index
+                //Retrieve capabilities struct at the specified index
                 int hr = audioStreamConfig.GetStreamCaps(index, out mediaType, caps);
 
                 if (hr != 0)
@@ -122,10 +129,8 @@ namespace TrulyRandom.DirectShow
         /// <summary>
         /// Check if the audio capability equals to the specified object.
         /// </summary>
-        /// 
-        /// <param name="obj">Object to compare with.</param>
-        /// 
-        /// <returns>Returns true if both are equal are equal or false otherwise.</returns>
+        /// <param name="obj">Object to compare with</param>
+        /// <returns>Returns true if both are equal are equal or false otherwise</returns>
         /// 
         public override bool Equals(object obj)
         {
@@ -133,51 +138,45 @@ namespace TrulyRandom.DirectShow
         }
 
         /// <summary>
-        /// Check if two audio capabilities are equal.
+        /// Check if two audio capabilities are equal
         /// </summary>
-        /// 
-        /// <param name="vc2">Second audio capability to compare with.</param>
-        /// 
-        /// <returns>Returns true if both audio capabilities are equal or false otherwise.</returns>
-        /// 
-        public bool Equals(AudioCapabilities vc2)
+        /// <param name="ac2">Second audio capability to compare with</param>
+        /// <returns>Returns true if both audio capabilities are equal or false otherwise</returns>
+        public bool Equals(AudioCapabilities ac2)
         {
-            if (vc2 == null)
+            if (ac2 == null)
             {
                 return false;
             }
 
-            return (AvgBytesPerSec == vc2.AvgBytesPerSec) && (BitsPerSample == vc2.BitsPerSample) && (BlockAlign == vc2.BlockAlign) && (Channels == vc2.Channels) && (SamplesPerSec == vc2.SamplesPerSec);
+            return (AvgBytesPerSec == ac2.AvgBytesPerSec) && (BitsPerSample == ac2.BitsPerSample) && (BlockAlign == ac2.BlockAlign) && (Channels == ac2.Channels) && (SamplesPerSec == ac2.SamplesPerSec);
         }
 
         /// <summary>
-        /// Get hash code of the object.
+        /// Get hash code of the object
         /// </summary>
-        /// 
-        /// <returns>Returns hash code ot the object </returns>
+        /// <returns>Returns hash code ot the object</returns>
         public override int GetHashCode()
         {
             return AvgBytesPerSec.GetHashCode() ^ BitsPerSample.GetHashCode() ^ BlockAlign.GetHashCode() ^ Channels.GetHashCode() ^ SamplesPerSec.GetHashCode();
         }
 
         /// <summary>
-        /// Equality operator.
+        /// Equality operator
         /// </summary>
-        /// 
-        /// <param name="a">First object to check.</param>
-        /// <param name="b">Seconds object to check.</param>
-        /// 
+        /// <param name="a">First object to check</param>
+        /// <param name="b">Seconds object to check</param>
         /// <returns>Return true if both objects are equal or false otherwise.</returns>
         public static bool operator ==(AudioCapabilities a, AudioCapabilities b)
         {
-            // if both are null, or both are same instance, return true.
-            if (object.ReferenceEquals(a, b))
+            //If both are null, or both are same instance, return true
+            if (ReferenceEquals(a, b))
             {
                 return true;
             }
 
-            // if one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
+            //If one is null, but not both, return false
+            if ((a is null) || (b is null))
             {
                 return false;
             }
@@ -186,13 +185,11 @@ namespace TrulyRandom.DirectShow
         }
 
         /// <summary>
-        /// Inequality operator.
+        /// Inequality operator
         /// </summary>
-        /// 
-        /// <param name="a">First object to check.</param>
-        /// <param name="b">Seconds object to check.</param>
-        /// 
-        /// <returns>Return true if both objects are not equal or false otherwise.</returns>
+        /// <param name="a">First object to check</param>
+        /// <param name="b">Seconds object to check</param>
+        /// <returns>Return true if both objects are not equal or false otherwise</returns>
         public static bool operator !=(AudioCapabilities a, AudioCapabilities b)
         {
             return !(a == b);

@@ -5,6 +5,9 @@ namespace TrulyRandom
 {
     //Copyright(C) 1984 Stephen L.Moshier(original C version - Cephes Math Library)
     //Copyright(C) 2005 Miroslav Stampar(C# version)
+    /// <summary>
+    /// Additional functions required by the test functions
+    /// </summary>
     static class NistTestUtils
     {
         const double MACHEP = 1.11022302462515654042E-16;
@@ -12,7 +15,9 @@ namespace TrulyRandom
         const double LOGPI = 1.14472988584940017414;
         const double SQRTH = 7.07106781186547524401E-1;
 
-        //Complementary Gauss error function
+        /// <summary>
+        /// Complementary Gauss error function
+        /// </summary>
         internal static double Erfc(double x)
         {
             // constants
@@ -429,7 +434,7 @@ namespace TrulyRandom
             return ans;
         }
 
-        internal static void def_matrix(BitArray data, int M, int Q, ref bool[,] m, int k)
+        internal static void DefineMatrix(BitArray data, int M, int Q, ref bool[,] m, int k)
         {
             int i, j;
 
@@ -442,7 +447,10 @@ namespace TrulyRandom
             }
         }
 
-        internal static int computeRank(int M, int Q, bool[,] matrix)
+        /// <summary>
+        /// Rank of the matrix
+        /// </summary>
+        internal static int ComputeRank(int M, int Q, bool[,] matrix)
         {
             int i, rank, m = Math.Min(M, Q);
 
@@ -451,13 +459,13 @@ namespace TrulyRandom
             {
                 if (matrix[i, i])
                 {
-                    perform_elementary_row_operations(MatrixOpertion.ForwardElimination, i, M, Q, matrix);
+                    PerformElementaryRowOperations(MatrixOpertion.ForwardElimination, i, M, Q, matrix);
                 }
                 else
                 {   /* matrix[i][i] = 0 */
-                    if (find_unit_element_and_swap(MatrixOpertion.ForwardElimination, i, M, Q, matrix))
+                    if (FindUnitElementAndSwap(MatrixOpertion.ForwardElimination, i, M, Q, matrix))
                     {
-                        perform_elementary_row_operations(MatrixOpertion.ForwardElimination, i, M, Q, matrix);
+                        PerformElementaryRowOperations(MatrixOpertion.ForwardElimination, i, M, Q, matrix);
                     }
                 }
             }
@@ -467,24 +475,24 @@ namespace TrulyRandom
             {
                 if (matrix[i, i])
                 {
-                    perform_elementary_row_operations(MatrixOpertion.BackwardElimination, i, M, Q, matrix);
+                    PerformElementaryRowOperations(MatrixOpertion.BackwardElimination, i, M, Q, matrix);
                 }
                 else
                 {   /* matrix[i][i] = 0 */
-                    if (find_unit_element_and_swap(MatrixOpertion.BackwardElimination, i, M, Q, matrix))
+                    if (FindUnitElementAndSwap(MatrixOpertion.BackwardElimination, i, M, Q, matrix))
                     {
-                        perform_elementary_row_operations(MatrixOpertion.BackwardElimination, i, M, Q, matrix);
+                        PerformElementaryRowOperations(MatrixOpertion.BackwardElimination, i, M, Q, matrix);
                     }
                 }
             }
 
-            rank = determine_rank(m, M, Q, matrix);
+            rank = DetermineRank(m, M, Q, matrix);
 
             return rank;
         }
 
         enum MatrixOpertion { ForwardElimination, BackwardElimination }
-        static void perform_elementary_row_operations(MatrixOpertion flag, int i, int M, int Q, bool[,] A)
+        static void PerformElementaryRowOperations(MatrixOpertion flag, int i, int M, int Q, bool[,] A)
         {
             int j, k;
 
@@ -516,7 +524,7 @@ namespace TrulyRandom
             }
         }
 
-        static bool find_unit_element_and_swap(MatrixOpertion flag, int i, int M, int Q, bool[,] A)
+        static bool FindUnitElementAndSwap(MatrixOpertion flag, int i, int M, int Q, bool[,] A)
         {
             int index;
 
@@ -530,7 +538,7 @@ namespace TrulyRandom
 
                 if (index < M)
                 {
-                    swap_rows(i, index, Q, A);
+                    SwapRows(i, index, Q, A);
                     return true;
                 }
             }
@@ -544,7 +552,7 @@ namespace TrulyRandom
 
                 if (index >= 0)
                 {
-                    swap_rows(i, index, Q, A);
+                    SwapRows(i, index, Q, A);
                     return true;
                 }
             }
@@ -552,7 +560,7 @@ namespace TrulyRandom
             return false;
         }
 
-        static int swap_rows(int i, int index, int Q, bool[,] A)
+        static int SwapRows(int i, int index, int Q, bool[,] A)
         {
             int p;
             bool temp;
@@ -567,7 +575,7 @@ namespace TrulyRandom
             return 1;
         }
 
-        static int determine_rank(int m, int M, int Q, bool[,] A)
+        static int DetermineRank(int m, int M, int Q, bool[,] A)
         {
             int i, j, rank, allZeroes;
 
@@ -595,10 +603,8 @@ namespace TrulyRandom
         }
 
         /// <summary>
-        /// Returns the area under the Gaussian probability density function, integrated from minus infinity to a.
+        /// Returns the area under the Gaussian probability density function, integrated from minus infinity to a
         /// </summary>
-        /// <param name="a"></param>
-        /// <returns></returns>
         public static double Normal(double a)
         {
             double x, y, z;
@@ -608,7 +614,7 @@ namespace TrulyRandom
 
             if (z < SQRTH)
             {
-                y = 0.5 + 0.5 * erf(x);
+                y = 0.5 + 0.5 * Erf(x);
             }
             else
             {
@@ -623,11 +629,9 @@ namespace TrulyRandom
         }
 
         /// <summary>
-        /// Returns the error function of the specified number.
+        /// Returns the error function of the specified number
         /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public static double erf(double x)
+        public static double Erf(double x)
         {
             double y, z;
             double[] T = {

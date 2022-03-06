@@ -105,8 +105,7 @@ namespace TrulyRandom.Modules.Extractors
         protected override byte[] ProcessData(byte[] data)
         {
             int blockSize = BlockSize;
-            List<int> positions = new List<int>();
-            positions.Add(0);
+            List<int> positions = new() { 0 };
 
             int currentBitPointer = 0;
             int leftoverBytes;
@@ -122,7 +121,7 @@ namespace TrulyRandom.Modules.Extractors
                 leftoverBytes = data.Length - (currentBitPointer / 8 + (currentBitPointer % 8 == 0 ? 0 : 1));
                 if (leftoverBytes < blockSize * 2)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
             }
             while (leftoverBytes / blockSize > positions.Count);
@@ -154,13 +153,13 @@ namespace TrulyRandom.Modules.Extractors
         /// <summary>
         /// Generates numbers from 0 to <paramref name="upperBound"/> using FDR (Fast Dice Roller) algorithm
         /// </summary>
-        int? GenerateRandomNumberFromArrayElements(byte[] array, ref int currentBitPointer, int upperBound, byte[] seed)
+        static int? GenerateRandomNumberFromArrayElements(byte[] array, ref int currentBitPointer, int upperBound, byte[] seed)
         {
             int v = 1, c = 0;
             while (true)
             {
-                v = v << 1;
-                c = c << 1;
+                v <<= 1;
+                c <<= 1;
 
                 if (currentBitPointer >= array.Length * 8)
                 {
@@ -186,7 +185,7 @@ namespace TrulyRandom.Modules.Extractors
         /// <summary>
         /// Gets specified bit from the specified array with respect to the seed
         /// </summary>
-        bool GetBit(byte[] array, ref int currentBitPointer, byte[] seed)
+        static bool GetBit(byte[] array, ref int currentBitPointer, byte[] seed)
         {
             int byteIndex = currentBitPointer / 8;
             int bitIndex = currentBitPointer % 8;

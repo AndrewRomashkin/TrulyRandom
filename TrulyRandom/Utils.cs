@@ -7,11 +7,19 @@ using System.Threading.Tasks;
 
 namespace TrulyRandom
 {
+    /// <summary>
+    /// Miscellaneous functions
+    /// </summary>
     public static class Utils
     {
         static readonly string[] SizeSuffixes =
                   { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
+        /// <summary>
+        /// Formats the amount of bytes into a human-readable format
+        /// </summary>
+        /// <param name="value">Amount of bytes</param>
+        /// <returns>Human-readable string</returns>
         public static string FormatBytes(long value)
         {
             if (value < 0)
@@ -20,7 +28,11 @@ namespace TrulyRandom
             }
             return FormatBytes((ulong)value);
         }
-
+        /// <summary>
+        /// Formats the amount of bytes into a human-readable format
+        /// </summary>
+        /// <param name="value">Amount of bytes</param>
+        /// <returns>Human-readable string</returns>
         public static string FormatBytes(ulong value)
         {
             int i = 0;
@@ -81,7 +93,7 @@ namespace TrulyRandom
         {
             if (data == null || data.Length < 8)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             byte[] result = new byte[data.Length / 8];
             data.CopyTo(result, 0);
@@ -95,7 +107,7 @@ namespace TrulyRandom
                 return "";
             }
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             for (int i = 0; i < data.Length; i++)
             {
                 sb.Append(data[i] ? '1' : '0');
@@ -107,7 +119,7 @@ namespace TrulyRandom
         {
             if (data == null || data.Length < 8)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             int bytes = data.Length / 8;
             byte[] result = new byte[bytes];
@@ -170,12 +182,16 @@ namespace TrulyRandom
 
             for (int i = 0; i < mid; i++)
             {
-                bool bit = array[i];
-                array[i] = array[length - i - 1];
-                array[length - i - 1] = bit;
+                (array[length - i - 1], array[i]) = (array[i], array[length - i - 1]);
             }
         }
 
+        /// <summary>
+        /// Turns a flags enumerable into an array of single-flag values
+        /// </summary>
+        /// <typeparam name="T">Enumerable type</typeparam>
+        /// <param name="input">Flags enumerable</param>
+        /// <returns>Array of single-flag values</returns>
         internal static IEnumerable<T> EnumerateFlags<T>(this T input) where T : Enum
         {
             foreach (Enum value in Enum.GetValues(input.GetType()))
@@ -187,14 +203,18 @@ namespace TrulyRandom
             }
         }
 
-        //mix the data from different sources
+        /// <summary>
+        /// Mixes the data from multiple arrays
+        /// </summary>
+        /// <param name="data">Jagged array to be mixed</param>
+        /// <returns>Mixed array</returns>
         internal static byte[] MixData(byte[][] data)
         {
-            List<byte> result = new List<byte>(data[0]);
+            List<byte> result = new(data[0]);
 
             for (int i = 1; i < data.Length; i++)
             {
-                List<byte> mix = new List<byte>();
+                List<byte> mix = new();
 
                 int index1 = 0, index2 = 0;
                 double ratio = result.Count / (double)data[i].Length;
@@ -222,6 +242,7 @@ namespace TrulyRandom
         /// <param name="fromInclusive">The start index, inclusive.</param>
         /// <param name="toExclusive">The end index, exclusive.</param>
         /// <param name="rangeSize">The partition size for splitting work into smaller pieces.</param>
+        /// <param name="threads">Maximum number of threads</param>
         /// <param name="body">The body to be invoked for each iteration range.</param>
         public static void ParallelFor(int fromInclusive, int toExclusive, int rangeSize, int threads, Action<int, int> body)
         {
@@ -274,7 +295,7 @@ namespace TrulyRandom
 
         internal static string FormatTable(string[] rowHeaders, string[][] data, int columnWidth)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             for (int row = 0; row < rowHeaders.Length; row++)
             {
@@ -285,12 +306,16 @@ namespace TrulyRandom
                 }
                 if (row != rowHeaders.Length - 1)
                 {
-                    sb.Append("\n");
+                    sb.Append('\n');
                 }
             }
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Ensures that execution of the method will be interrupted from time to time to ensure that other threads and processes get some processor time. This prevents computer from lagging while executing some long task
+        /// </summary>
+        /// <param name="lastBreak">Variable that holds last break time for the current thread</param>
         internal static void BreakExecution(ref DateTime lastBreak)
         {
             if (lastBreak.WasAgo(100))

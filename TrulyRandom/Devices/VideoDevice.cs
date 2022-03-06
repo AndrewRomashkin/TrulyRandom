@@ -47,7 +47,7 @@ namespace TrulyRandom.Devices
         /// </summary>
         public static DeviceDescriptor[] AvailableDevices => GetAvailableDevices(Clsid.VideoInputDevice);
 
-        static object autoSearchLock = new object();
+        static readonly object autoSearchLock = new();
 
         /// <summary>
         /// Returns a static lock object for all instances of this type
@@ -76,14 +76,14 @@ namespace TrulyRandom.Devices
         /// <returns>Unique thread name</returns>
         private protected override string GetThreadName()
         {
-            return "Video device thread: " + name;
+            return "Video device thread: " + Name;
         }
 
         //Members specific for video devices:
 
         private protected override AMMediaType GetAMMediaType()
         {
-            AMMediaType mediaType = new AMMediaType();
+            AMMediaType mediaType = new();
             mediaType.MajorType = MediaType.Video;
             mediaType.SubType = MediaSubType.RGB24;
 
@@ -102,8 +102,7 @@ namespace TrulyRandom.Devices
 
         private protected override void GetAndConfigurePinCapabilities(ICaptureGraphBuilder2 graphBuilder, IBaseFilter baseFilter)
         {
-            object streamConfigObject;
-            graphBuilder.FindInterface(PinCategory.Capture, MediaType.Video, baseFilter, typeof(IAMStreamConfig_Video).GUID, out streamConfigObject);
+            graphBuilder.FindInterface(PinCategory.Capture, MediaType.Video, baseFilter, typeof(IAMStreamConfig_Video).GUID, out object streamConfigObject);
 
             if (streamConfigObject != null)
             {
@@ -117,7 +116,7 @@ namespace TrulyRandom.Devices
                 {
                 }
 
-                VideoCapabilities[] videoCapabilities = new VideoCapabilities[0];
+                VideoCapabilities[] videoCapabilities = Array.Empty<VideoCapabilities>();
                 if (streamConfig != null)
                 {
                     try
@@ -142,7 +141,7 @@ namespace TrulyRandom.Devices
             }
         }
 
-        private void SetCapabilities(IAMStreamConfig_Video streamConfig, VideoCapabilities capabilities)
+        private static void SetCapabilities(IAMStreamConfig_Video streamConfig, VideoCapabilities capabilities)
         {
             if (capabilities == null)
             {
@@ -150,17 +149,16 @@ namespace TrulyRandom.Devices
             }
 
             AMMediaType newMediaType = null;
-            VideoStreamConfigCaps caps = new VideoStreamConfigCaps();
+            VideoStreamConfigCaps caps = new();
 
             // iterate through device's capabilities to find mediaType for desired resolution
-            int capabilitiesCount;
-            streamConfig.GetNumberOfCapabilities(out capabilitiesCount, out _);
+            streamConfig.GetNumberOfCapabilities(out int capabilitiesCount, out _);
 
             for (int i = 0; i < capabilitiesCount; i++)
             {
                 try
                 {
-                    VideoCapabilities vc = new VideoCapabilities(streamConfig, i);
+                    VideoCapabilities vc = new(streamConfig, i);
 
                     if (capabilities == vc)
                     {

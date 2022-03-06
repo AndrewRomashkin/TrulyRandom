@@ -4,6 +4,9 @@ using TrulyRandom;
 
 namespace UnitTests
 {
+    /// <summary>
+    /// Evaluates the uniformity of the result data distribution
+    /// </summary>
     [TestClass]
     public class DataSource
     {

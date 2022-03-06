@@ -27,9 +27,9 @@ namespace TrulyRandom.Modules.Sources
         [DllImport("user32.dll")]
         static extern int GetAsyncKeyState(int i);
 
-        List<byte> intermediateBuffer = new List<byte>();
-        Point lastPosition = new Point(int.MinValue, int.MinValue);
-        int[] lastKeyStates = new int[255];
+        readonly List<byte> intermediateBuffer = new();
+        Point lastPosition = new(int.MinValue, int.MinValue);
+        readonly int[] lastKeyStates = new int[255];
         /// <summary>
         /// Main loop
         /// </summary>
@@ -44,7 +44,7 @@ namespace TrulyRandom.Modules.Sources
                 }
 
                 //Cursor position
-                Point position = new Point();
+                Point position = new();
 
                 GetCursorPos(ref position);
 

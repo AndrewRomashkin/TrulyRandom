@@ -16,9 +16,9 @@ namespace TrulyRandom.Models
         /// </summary>
         public double ActualCompression { get; protected set; } = 0;
         /// <summary>
-        /// Data sources for this extractor
+        /// Sources of data for this extractor
         /// </summary>
-        public Module[] Sources { get; set; } = new Module[0];
+        public Module[] Sources { get; set; } = Array.Empty<Module>();
         /// <summary>
         /// Determines whether data block should be taken from all available sources and concatenated (<c>true</c>), or from one source if possible (<c>false</c>)
         /// </summary>
@@ -70,8 +70,8 @@ namespace TrulyRandom.Models
         /// <summary>
         /// Processed block history
         /// </summary>
-        List<(int Input, int Output, double Time)> history = new List<(int Input, int Output, double Time)>();
-        Stopwatch stopwatch = new Stopwatch();
+        readonly List<(int Input, int Output, double Time)> history = new();
+        readonly Stopwatch stopwatch = new();
 
         /// <summary>
         /// Main thread
@@ -258,10 +258,10 @@ namespace TrulyRandom.Models
             Module[] sources = Sources;
             if (sources.Length == 0)
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
 
-            List<Module> lockedSources = new List<Module>();
+            List<Module> lockedSources = new();
             try
             {
                 foreach (Module source in sources)
@@ -274,14 +274,14 @@ namespace TrulyRandom.Models
 
                 if (!lockedSources.Any())
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
 
                 int totalAvailableBytes = lockedSources.Sum(x => x.BytesInBuffer);
 
                 if (totalAvailableBytes < count)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
 
                 byte[][] data = new byte[lockedSources.Count][];
@@ -303,7 +303,7 @@ namespace TrulyRandom.Models
 
                 if (data.Sum(x => x.Length) == 0)
                 {
-                    return new byte[0];
+                    return Array.Empty<byte>();
                 }
 
                 if (MixDataFromDifferentSources)
@@ -315,7 +315,7 @@ namespace TrulyRandom.Models
             }
             catch
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
             finally
             {

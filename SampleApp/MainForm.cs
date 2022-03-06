@@ -8,6 +8,7 @@ using TrulyRandom.Modules;
 using TrulyRandom.Modules.Extractors;
 using TrulyRandom.Modules.Sources;
 
+#pragma warning disable IDE1006 // Naming Styles
 namespace SampleApp
 {
     public partial class MainForm : Form

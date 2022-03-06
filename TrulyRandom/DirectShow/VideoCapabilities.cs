@@ -9,38 +9,43 @@ namespace TrulyRandom.DirectShow
     class VideoCapabilities
     {
         /// <summary>
-        /// Frame size supported by video device.
+        /// Frame size supported by video device
         /// </summary>
         public readonly Size FrameSize;
 
         /// <summary>
-        /// Average frame rate of video device for corresponding <see cref="FrameSize">frame size</see>.
+        /// Average frame rate of video device for corresponding <see cref="FrameSize">frame size</see>
         /// </summary>
         public readonly int AverageFrameRate;
 
         /// <summary>
-        /// Maximum frame rate of video device for corresponding <see cref="FrameSize">frame size</see>.
+        /// Maximum frame rate of video device for corresponding <see cref="FrameSize">frame size</see>
         /// </summary>
         public readonly int MaximumFrameRate;
 
         /// <summary>
-        /// Number of bits per pixel provided by the camera.
+        /// Number of bits per pixel provided by the camera
         /// </summary>
         public readonly int BitCount;
 
         internal VideoCapabilities() { }
 
-        // Retrieve capabilities of a video device
+        /// <summary>
+        /// Retrieves capabilities of a video device
+        /// </summary>
+        /// <param name="videoStreamConfig"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="NotSupportedException"></exception>
         internal static VideoCapabilities[] FromStreamConfig(IAMStreamConfig_Video videoStreamConfig)
         {
             if (videoStreamConfig == null)
             {
-                throw new ArgumentNullException("videoStreamConfig");
+                throw new ArgumentNullException(nameof(videoStreamConfig));
             }
 
-            // ensure this device reports capabilities
-            int count, size;
-            int hr = videoStreamConfig.GetNumberOfCapabilities(out count, out size);
+            //Ensure this device reports capabilities
+            int hr = videoStreamConfig.GetNumberOfCapabilities(out int count, out int size);
 
             if (hr != 0)
             {
@@ -57,14 +62,14 @@ namespace TrulyRandom.DirectShow
                 throw new NotSupportedException("Unable to retrieve video device capabilities. This video device requires a larger VideoStreamConfigCaps structure.");
             }
 
-            // group capabilities with similar parameters
-            Dictionary<uint, VideoCapabilities> videocapsList = new Dictionary<uint, VideoCapabilities>();
+            //Group capabilities with similar parameters
+            Dictionary<uint, VideoCapabilities> videocapsList = new();
 
             for (int i = 0; i < count; i++)
             {
                 try
                 {
-                    VideoCapabilities vc = new VideoCapabilities(videoStreamConfig, i);
+                    VideoCapabilities vc = new(videoStreamConfig, i);
 
                     uint key = (((uint)vc.FrameSize.Height) << 32) |
                                (((uint)vc.FrameSize.Width) << 16);
@@ -92,15 +97,20 @@ namespace TrulyRandom.DirectShow
             return videocaps;
         }
 
-        // Retrieve capabilities of a video device
+        /// <summary>
+        /// Retrieves capabilities of a video device
+        /// </summary>
+        /// <param name="videoStreamConfig"></param>
+        /// <param name="index"></param>
+        /// <exception cref="ApplicationException"></exception>
         internal VideoCapabilities(IAMStreamConfig_Video videoStreamConfig, int index)
         {
             AMMediaType mediaType = null;
-            VideoStreamConfigCaps caps = new VideoStreamConfigCaps();
+            VideoStreamConfigCaps caps = new();
 
             try
             {
-                // retrieve capabilities struct at the specified index
+                //Retrieve capabilities struct at the specified index
                 int hr = videoStreamConfig.GetStreamCaps(index, out mediaType, caps);
 
                 if (hr != 0)
@@ -131,9 +141,7 @@ namespace TrulyRandom.DirectShow
                     throw new ApplicationException("Unsupported format found.");
                 }
 
-                // ignore 12 bpp formats for now, since it was noticed they cause issues on Windows 8
-                // TODO: proper fix needs to be done so ICaptureGraphBuilder2::RenderStream() does not fail
-                // on such formats
+                // Ignore 12 bpp formats, since it was noticed they cause issues on Windows 8
                 if (BitCount <= 12)
                 {
                     throw new ApplicationException("Unsupported format found.");
@@ -149,29 +157,23 @@ namespace TrulyRandom.DirectShow
         }
 
         /// <summary>
-        /// Check if the video capability equals to the specified object.
+        /// Check if the video capability equals to the specified object
         /// </summary>
-        /// 
-        /// <param name="obj">Object to compare with.</param>
-        /// 
-        /// <returns>Returns true if both are equal are equal or false otherwise.</returns>
-        /// 
+        /// <param name="obj">Object to compare with</param>
+        /// <returns>Returns true if both are equal are equal or false otherwise</returns>
         public override bool Equals(object obj)
         {
             return Equals(obj as VideoCapabilities);
         }
 
         /// <summary>
-        /// Check if two video capabilities are equal.
+        /// Check if two video capabilities are equal
         /// </summary>
-        /// 
-        /// <param name="vc2">Second video capability to compare with.</param>
-        /// 
-        /// <returns>Returns true if both video capabilities are equal or false otherwise.</returns>
-        /// 
+        /// <param name="vc2">Second video capability to compare with</param>
+        /// <returns>Returns true if both video capabilities are equal or false otherwise</returns>
         public bool Equals(VideoCapabilities vc2)
         {
-            if ((object)vc2 == null)
+            if (vc2 is null)
             {
                 return false;
             }
@@ -180,33 +182,30 @@ namespace TrulyRandom.DirectShow
         }
 
         /// <summary>
-        /// Get hash code of the object.
+        /// Get hash code of the object
         /// </summary>
-        /// 
-        /// <returns>Returns hash code ot the object </returns>
+        /// <returns>Returns hash code ot the object</returns>
         public override int GetHashCode()
         {
             return FrameSize.GetHashCode() ^ BitCount;
         }
 
         /// <summary>
-        /// Equality operator.
+        /// Equality operator
         /// </summary>
-        /// 
-        /// <param name="a">First object to check.</param>
-        /// <param name="b">Seconds object to check.</param>
-        /// 
-        /// <returns>Return true if both objects are equal or false otherwise.</returns>
+        /// <param name="a">First object to check</param>
+        /// <param name="b">Seconds object to check</param>
+        /// <returns>Return true if both objects are equal or false otherwise</returns>
         public static bool operator ==(VideoCapabilities a, VideoCapabilities b)
         {
-            // if both are null, or both are same instance, return true.
-            if (object.ReferenceEquals(a, b))
+            //If both are null, or both are same instance, return true
+            if (ReferenceEquals(a, b))
             {
                 return true;
             }
 
-            // if one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null))
+            //If one is null, but not both, return false
+            if ((a is null) || (b is null))
             {
                 return false;
             }
@@ -215,13 +214,11 @@ namespace TrulyRandom.DirectShow
         }
 
         /// <summary>
-        /// Inequality operator.
+        /// Inequality operator
         /// </summary>
-        /// 
-        /// <param name="a">First object to check.</param>
-        /// <param name="b">Seconds object to check.</param>
-        /// 
-        /// <returns>Return true if both objects are not equal or false otherwise.</returns>
+        /// <param name="a">First object to check</param>
+        /// <param name="b">Seconds object to check</param>
+        /// <returns>Return true if both objects are not equal or false otherwise</returns>
         public static bool operator !=(VideoCapabilities a, VideoCapabilities b)
         {
             return !(a == b);

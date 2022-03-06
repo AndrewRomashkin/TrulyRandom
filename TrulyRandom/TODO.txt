@@ -2,3 +2,7 @@
 2. Compress video stream via DirectShow
 3. Save tester state
 4. Test every N-th block
+5. Correct maximum amount of threads
+6. Restrict testing for too short sequences
+7. Test even with insufficient cycles
+8. Temporarily disable testing

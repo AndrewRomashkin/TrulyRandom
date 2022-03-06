@@ -48,7 +48,7 @@ namespace TrulyRandom.Modules.Extractors
         /// <summary>
         /// Selected hash function
         /// </summary>
-        HashFunctionEnum hashFunction = HashFunctionEnum.SHA512;
+        readonly HashFunctionEnum hashFunction = HashFunctionEnum.SHA512;
         HashAlgorithm hash = SHA512.Create();
 
         /// <summary>
@@ -64,25 +64,14 @@ namespace TrulyRandom.Modules.Extractors
                     return;
                 }
 
-                switch (HashFunction)
+                hash = HashFunction switch
                 {
-                    case HashFunctionEnum.MD5:
-                        hash = MD5.Create();
-                        break;
-                    case HashFunctionEnum.SHA1:
-                        hash = SHA1.Create();
-                        break;
-                    case HashFunctionEnum.SHA256:
-                        hash = SHA256.Create();
-                        break;
-                    case HashFunctionEnum.SHA384:
-                        hash = SHA384.Create();
-                        break;
-                    default:
-                    case HashFunctionEnum.SHA512:
-                        hash = SHA512.Create();
-                        break;
-                }
+                    HashFunctionEnum.MD5 => MD5.Create(),
+                    HashFunctionEnum.SHA1 => SHA1.Create(),
+                    HashFunctionEnum.SHA256 => SHA256.Create(),
+                    HashFunctionEnum.SHA384 => SHA384.Create(),
+                    _ => SHA512.Create(),
+                };
                 ActualCompression = (double)InputBlockSize / hash.HashSize * 8;
             }
         }
@@ -146,7 +135,7 @@ namespace TrulyRandom.Modules.Extractors
         protected override byte[] ProcessData(byte[] data)
         {
             int inputBlockSize = InputBlockSize * currentMultiplier;
-            List<byte> result = new List<byte>();
+            List<byte> result = new();
             for (int i = 0; i < data.Length / inputBlockSize; i++)
             {
                 byte[] hashResult;

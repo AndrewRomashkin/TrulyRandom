@@ -10,9 +10,18 @@ namespace TrulyRandom
     //Source: NIST Statistical Testing Suite, NIST Special Publication 800-22
     public partial class NistTests
     {
-        public static RawTestResult Frequency(BitArray data)
+        /// <summary>
+        /// The focus of the test is the proportion of zeroes and ones for the entire sequence.
+        /// The purpose of this test is to determine whether the number of ones and zeros in a sequence are approximately
+        /// the same as wouldbe expected for a truly random sequence. The test assesses the closeness of the fraction of
+        /// ones to ½, that is, the number of ones and zeroes in a sequence should be about the same.<br/>
+        /// For more info, see section 2.1 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult Frequency(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             int sum = 0;
             for (int i = 0; i < data.Length; i++)
@@ -25,7 +34,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -37,12 +46,21 @@ namespace TrulyRandom
                             $"Sum/n   = {(double)sum / data.Length}\n" +
                             $"P-value = {pValue:0.####}\n" +
                             $"Time    = {(int)sw.ElapsedMilliseconds} ms";
-            return new RawTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult BlockFrequency(BitArray data, int blockLength)
+        /// <summary>
+        /// The focus of the test is the proportion of ones within M-bit blocks.
+        /// The purpose of this test is to determine whether the frequency of ones in an M-bit block is approximately M/2, 
+        /// as would be expected under an assumption of randomness.<br/>
+        /// For more info, see section 2.2 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult BlockFrequency(BitArray data, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (blockLength < 2) //blockLength ≥ 20, blockLength > dataLength/100
             {
@@ -70,7 +88,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -84,12 +102,22 @@ namespace TrulyRandom
                             $"Discarded bits = {data.Length % blockLength}\n" +
                             $"P-value        = {pValue:0.####}\n" +
                             $"Time           = {(int)sw.ElapsedMilliseconds} ms";
-            return new RawTestResult(new double[] { pValue }, blockLength * blockCount, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, blockLength * blockCount, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult Runs(BitArray data)
+        /// <summary>
+        /// The focus of this test is the total number of runs in the sequence, where a run is an uninterrupted sequence
+        /// of identical bits. A run of length k consists of exactly k identical bits and is bounded before and after with
+        /// a bit of the opposite value. The purpose of the runs test is to determine whether the number of runs of
+        /// ones and zeros of various lengths is as expected for a random sequence. In particular, this test determines
+        /// whether the oscillation between such zeros and ones is too fast or too slow.<br/>
+        /// For more info, see section 2.3 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult Runs(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             int sum = 0;
             for (int i = 0; i < data.Length; i++)
@@ -105,7 +133,7 @@ namespace TrulyRandom
             if (Math.Abs(proportionOfOnes - 0.5) > (2.0 / Math.Sqrt(data.Length)))
             {
                 sw.Stop();
-                return new RawTestResult(new double[] { 0 }, data.Count,
+                return new SingleTestResult(new double[] { 0 }, data.Count,
                     $"---------\n" +
                     $"Runs test\n" +
                     $"---------\n" +
@@ -126,7 +154,7 @@ namespace TrulyRandom
             double pValue = NistTestUtils.Erfc(Math.Abs(runs - expected) / (2.0 * proportionOfOnes * (1 - proportionOfOnes) * Math.Sqrt(2 * data.Length)));
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -139,12 +167,20 @@ namespace TrulyRandom
                             $"Expected runs = {expected:0.####}\n" +
                             $"P-value       = {pValue:0.####}\n" +
                             $"Time          = {(int)sw.ElapsedMilliseconds} ms";
-            return new RawTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult LongestRunOfOnes(BitArray data)
+        /// <summary>
+        /// The focus of the test is the longest run of ones within M-bit blocks. The purpose of this test is to
+        /// determine whether the length of the longest run of ones within the tested sequence is consistent with the
+        /// length of the longest run of ones that would be expected in a random sequence.<br/>
+        /// For more info, see section 2.4 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult LongestRunOfOnes(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             double[] probabilities = new double[7]; //pi in the paper
             int[] V = new int[7];
@@ -234,7 +270,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -255,25 +291,33 @@ namespace TrulyRandom
                     Enumerable.Range(0, K+1).Select(i=>(blockCount * probabilities[i]).ToString("0.####")).ToArray(),
                     Enumerable.Range(0, K+1).Select(i=>occurences[i].ToString("0.####")).ToArray()
                 }, 8);
-            return new RawTestResult(new double[] { pValue }, blockCount * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, blockCount * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult BinaryMatrixRank(BitArray data, int size)
+        /// <summary>
+        /// The focus of the test is the rank of disjoint sub-matrices of the entire sequence. The purpose of this test is
+        /// to check for linear dependence among fixed length substrings of the original sequence.<br/>
+        /// For more info, see section 2.5 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="matrixSize">Size of a single matrix (-1 for autoselection). Matrices are square, so they contain matrixSize^2 elements</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult BinaryMatrixRank(BitArray data, int matrixSize)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
-            if (size < 3) // dataLength ≥ 38*size^2
+            if (matrixSize < 3) // dataLength ≥ 38*matrixSize^2
             {
-                size = Math.Min(50, Math.Max(1, (int)Math.Sqrt(data.Length / 38)));
+                matrixSize = Math.Min(50, Math.Max(1, (int)Math.Sqrt(data.Length / 38)));
             }
 
-            bool[,] matrix = new bool[size, size];
+            bool[,] matrix = new bool[matrixSize, matrixSize];
 
-            int matrixCount = data.Length / (size * size);
+            int matrixCount = data.Length / (matrixSize * matrixSize);
             if (matrixCount == 0)
             {
                 sw.Stop();
-                return new RawTestResult(new double[] { 0 }, data.Count,
+                return new SingleTestResult(new double[] { 0 }, data.Count,
                             $"-----------------------\n" +
                             $"Binary matrix rank test\n" +
                             $"-----------------------\n" +
@@ -282,15 +326,15 @@ namespace TrulyRandom
 
             // Compute probabilities
             double fullRankProbability = 1;
-            for (int i = 0; i <= size - 1; i++)
+            for (int i = 0; i <= matrixSize - 1; i++)
             {
-                fullRankProbability *= 1 - Math.Pow(2, i - size);
+                fullRankProbability *= 1 - Math.Pow(2, i - matrixSize);
             }
 
             double fullRankMinus1Probability = 1;
-            for (int i = 0; i <= size - 2; i++)
+            for (int i = 0; i <= matrixSize - 2; i++)
             {
-                fullRankMinus1Probability *= Math.Pow(1 - Math.Pow(2, i - size), 2) / (1 - Math.Pow(2, i - size + 1));
+                fullRankMinus1Probability *= Math.Pow(1 - Math.Pow(2, i - matrixSize), 2) / (1 - Math.Pow(2, i - matrixSize + 1));
             }
             fullRankMinus1Probability /= 2;
 
@@ -301,13 +345,13 @@ namespace TrulyRandom
             DateTime lastBreak = DateTime.Now;
             for (int i = 0; i < matrixCount; i++)
             {
-                NistTestUtils.def_matrix(data, size, size, ref matrix, i);
-                int rank = NistTestUtils.computeRank(size, size, matrix);
-                if (rank == size)
+                NistTestUtils.DefineMatrix(data, matrixSize, matrixSize, ref matrix, i);
+                int rank = NistTestUtils.ComputeRank(matrixSize, matrixSize, matrix);
+                if (rank == matrixSize)
                 {
                     fullRankMatrices++;
                 }
-                if (rank == size - 1)
+                if (rank == matrixSize - 1)
                 {
                     fullRankMinus1Matrices++;
                 }
@@ -323,7 +367,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -331,23 +375,31 @@ namespace TrulyRandom
                             $"Binary matrix rank test\n" +
                             $"-----------------------\n" +
                             $"N              = {data.Length}\n" +
-                            $"Matrix size    = {size}*{size}\n" +
+                            $"Matrix size    = {matrixSize}*{matrixSize}\n" +
                             $"Matrices       = {matrixCount}\n" +
                             $"Chi^2          = {chi2:0.####}\n" +
-                            $"Discarded bits = {data.Length % (size * size)}\n" +
+                            $"Discarded bits = {data.Length % (matrixSize * matrixSize)}\n" +
                             $"P-value        = {pValue:0.####}\n" +
                             $"Time           = {(int)sw.ElapsedMilliseconds} ms\n\n" +
                             $"Rank probabilities:\n" +
-                            $"Rank      {size,-8}{size - 1,-8}<={size - 2}\n" +
+                            $"Rank      {matrixSize,-8}{matrixSize - 1,-8}<={matrixSize - 2}\n" +
                             $"Expected  {fullRankProbability,-8:0.####}{fullRankMinus1Probability,-8:0.####}{otherRankProbability:0.####}\n" +
                             $"Observed  {fullRankMatrices / (double)matrixCount,-8:0.####}{fullRankMinus1Matrices / (double)matrixCount,-8:0.####}{otherRankMatrices / (double)matrixCount:0.####}";
 
-            return new RawTestResult(new double[] { pValue }, matrixCount * size * size, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, matrixCount * matrixSize * matrixSize, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult DiscreteFourierTransform(BitArray data)
+        /// <summary>
+        /// The focus of this test is the peak heights in the Discrete Fourier Transform of the sequence. The purpose
+        /// of this test is to detect periodic features (i.e., repetitive patterns that are near each other) in the tested
+        /// sequence that would indicate a deviation from the assumption of randomness.<br/>
+        /// For more info, see section 2.6 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult DiscreteFourierTransform(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             System.Numerics.Complex[] samples = new System.Numerics.Complex[data.Length];
             for (int i = 0; i < data.Length; i++)
@@ -366,7 +418,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -379,21 +431,26 @@ namespace TrulyRandom
                             $"Observed peaks = {observedPeaks}\n" +
                             $"P-value        = {pValue:0.####}\n" +
                             $"Time           = {(int)sw.ElapsedMilliseconds} ms";
-            return new RawTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
         #region Non-overlapping template matchings
+        /// <summary>
+        /// Generates all possible aperiodic templates of the given length
+        /// </summary>
+        /// <param name="length">Length of the templates</param>
+        /// <returns>All possible aperiodic templates of the given length</returns>
         public static BitArray[] GenerateAperiodicTemplates(int length)
         {
             if (length < 2)
             {
-                return new BitArray[0];
+                return Array.Empty<BitArray>();
             }
 
-            List<BitArray> result = new List<BitArray>();
+            List<BitArray> result = new();
             for (int i = 1; i < Math.Pow(2, length); i++)
             {
-                BitArray template = new BitArray(new int[] { i });
+                BitArray template = new(new int[] { i });
 
                 bool match = true;
                 for (int j = 1; j < length; j++)
@@ -424,11 +481,26 @@ namespace TrulyRandom
             return result.ToArray();
         }
 
-        public static RawTestResult NonOverlappingTemplateMatchings(BitArray data, BitArray[] templates, int blockLength)
+        /// <summary>
+        /// The focus of this test is the number of occurrences of pre-specified target strings. The purpose of this
+        /// test is to detect generators that produce too many occurrences of a given non-periodic (aperiodic) pattern.
+        /// For this test and for the Overlapping Template Matching test of Section 2.8, an m-bit window is used to
+        /// search for a specific m-bit pattern. If the pattern is not found, the window slides one bit position. If the
+        /// pattern is found, the window is reset to the bit after the found pattern, and the search resumes.<br/>
+        /// For more info, see section 2.7 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templates">An array of templates to be used for testing (null for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult NonOverlappingTemplateMatchings(BitArray data, BitArray[] templates, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
-            templates = templates.Where(x => x.Length >= 2).ToArray();
+            if (templates != null)
+            {
+                templates = templates.Where(x => x.Length >= 2).ToArray();
+            }
             if (templates == null || templates.Length == 0)
             {
                 templates = GenerateAperiodicTemplates(9);
@@ -510,12 +582,24 @@ namespace TrulyRandom
                 }
             }
 
-            return new RawTestResult(results.Select(x => x.PValue).ToArray(), data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(results.Select(x => x.PValue).ToArray(), data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult NonOverlappingTemplateMatchings(BitArray data, int templateLength, int blockLength)
+        /// <summary>
+        /// The focus of this test is the number of occurrences of pre-specified target strings. The purpose of this
+        /// test is to detect generators that produce too many occurrences of a given non-periodic (aperiodic) pattern.
+        /// For this test and for the Overlapping Template Matching test of Section 2.8, an m-bit window is used to
+        /// search for a specific m-bit pattern. If the pattern is not found, the window slides one bit position. If the
+        /// pattern is found, the window is reset to the bit after the found pattern, and the search resumes.<br/>
+        /// For more info, see section 2.7 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templateLength">Length of the templates to be used (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult NonOverlappingTemplateMatchings(BitArray data, int templateLength, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (templateLength < 2)
             {
@@ -570,12 +654,24 @@ namespace TrulyRandom
                 }
             }
 
-            return new RawTestResult(results.Select(x => x.PValue).ToArray(), data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(results.Select(x => x.PValue).ToArray(), data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult NonOverlappingTemplateMatchings(BitArray data, BitArray template, int blockLength)
+        /// <summary>
+        /// The focus of this test is the number of occurrences of pre-specified target strings. The purpose of this
+        /// test is to detect generators that produce too many occurrences of a given non-periodic (aperiodic) pattern.
+        /// For this test and for the Overlapping Template Matching test of Section 2.8, an m-bit window is used to
+        /// search for a specific m-bit pattern. If the pattern is not found, the window slides one bit position. If the
+        /// pattern is found, the window is reset to the bit after the found pattern, and the search resumes.<br/>
+        /// For more info, see section 2.7 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="template">Template to be used</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult NonOverlappingTemplateMatchings(BitArray data, BitArray template, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (blockLength < 2)
             {
@@ -615,7 +711,7 @@ namespace TrulyRandom
                          $"Time            = {(int)sw.ElapsedMilliseconds} ms";
             }
 
-            return new RawTestResult(new double[] { testResult.PValue }, data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { testResult.PValue }, data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
         struct NonOverlappingTemplateMatchingsTestResult
@@ -678,7 +774,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             return new NonOverlappingTemplateMatchingsTestResult(mean, variance, chi2, pValue);
@@ -686,7 +782,20 @@ namespace TrulyRandom
         #endregion Non-overlapping template matchings
 
         #region Overlapping template matchings
-        public static RawTestResult OverlappingTemplateMatchings(BitArray data, int templateLength, int degreesOfFreedom, int blockLength)
+        /// <summary>
+        /// The focus of the Overlapping Template Matching test is the number of occurrences of pre-specified target
+        /// strings. Both this test and the Non-overlapping Template Matching use an m-bit window to search 
+        /// for a specific m-bit pattern. As with the Non-overlapping Template Matching test, if the pattern is not found,
+        /// the window slides one bit position. The difference between this test and the test in Section 2.7 is that
+        /// when the pattern is found, the window slides only one bit before resuming the search.<br/>
+        /// For more info, see section 2.8 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templateLength">Length of the template to be used (-1 for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult OverlappingTemplateMatchings(BitArray data, int templateLength, int degreesOfFreedom, int blockLength)
         {
             if (templateLength < 2)
             {
@@ -695,11 +804,27 @@ namespace TrulyRandom
             return OverlappingTemplateMatchings(data, new BitArray(Enumerable.Repeat(true, templateLength).ToArray()), degreesOfFreedom, blockLength);
         }
 
-        public static RawTestResult OverlappingTemplateMatchings(BitArray data, BitArray[] templates, int degreesOfFreedom, int blockLength)
+        /// <summary>
+        /// The focus of the Overlapping Template Matching test is the number of occurrences of pre-specified target
+        /// strings. Both this test and the Non-overlapping Template Matching use an m-bit window to search 
+        /// for a specific m-bit pattern. As with the Non-overlapping Template Matching test, if the pattern is not found,
+        /// the window slides one bit position. The difference between this test and the test in Section 2.7 is that
+        /// when the pattern is found, the window slides only one bit before resuming the search.<br/>
+        /// For more info, see section 2.8 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templates">Templates to be used (null for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult OverlappingTemplateMatchings(BitArray data, BitArray[] templates, int degreesOfFreedom, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
-            templates = templates.Where(x => x.Length >= 2).ToArray();
+            if (templates != null)
+            {
+                templates = templates.Where(x => x.Length >= 2).ToArray();
+            }
             if (templates == null || templates.Length == 0)
             {
                 templates = new BitArray[] { new BitArray(Enumerable.Repeat(true, 9).ToArray()) };
@@ -755,12 +880,25 @@ namespace TrulyRandom
                 }
             }
 
-            return new RawTestResult(results.Select(x => x.PValue).ToArray(), Enumerable.Range(0, templates.Length).Select(i => data.Length / blockLengths[i] * blockLengths[i]).Min(), report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(results.Select(x => x.PValue).ToArray(), Enumerable.Range(0, templates.Length).Select(i => data.Length / blockLengths[i] * blockLengths[i]).Min(), report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult OverlappingTemplateMatchings(BitArray data, BitArray template, int degreesOfFreedom, int blockLength)
+        /// <summary>
+        /// The focus of the Overlapping Template Matching test is the number of occurrences of pre-specified target
+        /// strings. Both this test and the Non-overlapping Template Matching use an m-bit window to search 
+        /// for a specific m-bit pattern. As with the Non-overlapping Template Matching test, if the pattern is not found,
+        /// the window slides one bit position. The difference between this test and the test in Section 2.7 is that
+        /// when the pattern is found, the window slides only one bit before resuming the search.<br/>
+        /// For more info, see section 2.8 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="template">Template to be used (-1 for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult OverlappingTemplateMatchings(BitArray data, BitArray template, int degreesOfFreedom, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (template == null || template.Length < 2)
             {
@@ -803,7 +941,7 @@ namespace TrulyRandom
                         Enumerable.Range(0, degreesOfFreedom+1).Select(i=>(result.Occurrences[i] / (double)blockCount).ToString("0.####")).ToArray()
                     }, 8);
 
-            return new RawTestResult(new double[] { result.PValue }, data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { result.PValue }, data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
         struct OverlappingTemplateMatchingsTestResult
@@ -886,15 +1024,26 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
             return new OverlappingTemplateMatchingsTestResult(mean, eta, occurrences, probabilities, chi2, pValue);
         }
         #endregion Overlapping template matchings
 
-        public static RawTestResult MaurersUniversal(BitArray data, int blockLength, int initializationBlocks)
+        /// <summary>
+        /// The focus of this test is the number of bits between matching patterns (a measure that is related to the
+        /// length of a compressed sequence). The purpose of the test is to detect whether or not the sequence can be
+        /// significantly compressed without loss of information. A significantly compressible sequence is
+        /// considered to be non-random.<br/>
+        /// For more info, see section 2.9 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <param name="initializationBlocks">A number of blocks used to initialize the table (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult MaurersUniversal(BitArray data, int blockLength, int initializationBlocks)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (blockLength < 2 || blockLength > 16)
             {
@@ -959,7 +1108,7 @@ namespace TrulyRandom
 
             //sigma in paper
             //Formula 16, in Marsaglia's Paper
-            //Example specifies mean = Math.Sqrt(variance[blockLength]);
+            //Example specifies mean = Math.Sqrt(variance[blockLength]), description - the following:
             double mean = (0.7 - 0.8 / blockLength + (4 + 32 / (double)blockLength) * Math.Pow(blockCount, -3 / (double)blockLength) / 15) * Math.Sqrt(variance[blockLength] / blockCount);
             double phi = 0;
 
@@ -989,7 +1138,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -1008,12 +1157,22 @@ namespace TrulyRandom
                             $"P-value               = {pValue:0.####}\n" +
                             $"Time                  = {(int)sw.ElapsedMilliseconds} ms";
 
-            return new RawTestResult(new double[] { pValue }, (blockCount + initializationBlocks) * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, (blockCount + initializationBlocks) * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult LinearComplexity(BitArray data, int blockLength, int degreesOfFreedom)
+        /// <summary>
+        /// The focus of this test is the length of a linear feedback shift register (LFSR). The purpose of this test is to
+        /// determine whether or not the sequence is complex enough to be considered random. Random sequences
+        /// are characterized by longer LFSRs. An LFSR that is too short implies non-randomness.<br/>
+        /// For more info, see section 2.10 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult LinearComplexity(BitArray data, int blockLength, int degreesOfFreedom)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (blockLength < 2)
             {
@@ -1055,10 +1214,10 @@ namespace TrulyRandom
                 DateTime lastBreak = DateTime.Now;
                 for (int block = u; block < v; block++)
                 {
-                    BitArray T = new BitArray(blockLength);
-                    BitArray P = new BitArray(blockLength);
-                    BitArray B = new BitArray(blockLength);
-                    BitArray C = new BitArray(blockLength);
+                    BitArray T = new(blockLength);
+                    BitArray P = new(blockLength);
+                    BitArray B = new(blockLength);
+                    BitArray C = new(blockLength);
                     int L = 0;
                     int m = -1;
                     C[0] = true;
@@ -1151,7 +1310,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -1178,12 +1337,23 @@ namespace TrulyRandom
                         Enumerable.Range(0, degreesOfFreedom*2+1).Select(i=>(occurrences[i] / (double)blockCount).ToString("0.####")).ToArray()
                     }, 15);
 
-            return new RawTestResult(new double[] { pValue }, blockCount * blockLength, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, blockCount * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult Serial(BitArray data, int blockLength)
+        /// <summary>
+        /// The focus of this test is the frequency of all possible overlapping m-bit patterns across the entire
+        /// sequence. The purpose of this test is to determine whether the number of occurrences of the 2m m-bit
+        /// overlapping patterns is approximately the same as would be expected for a random sequence. Random
+        /// sequences have uniformity; that is, every m-bit pattern has the same chance of appearing as every other
+        /// m-bit pattern.<br/>
+        /// For more info, see section 2.11 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult Serial(BitArray data, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (blockLength < 2) //m < [log2 n]-2
             {
@@ -1191,11 +1361,11 @@ namespace TrulyRandom
             }
 
             DateTime lastBreak = DateTime.Now;
-            double psim0 = psi2(data, blockLength);
+            double psim0 = Psi2(data, blockLength);
             Utils.BreakExecution(ref lastBreak);
-            double psim1 = psi2(data, blockLength - 1);
+            double psim1 = Psi2(data, blockLength - 1);
             Utils.BreakExecution(ref lastBreak);
-            double psim2 = psi2(data, blockLength - 2);
+            double psim2 = Psi2(data, blockLength - 2);
             Utils.BreakExecution(ref lastBreak);
             double del1 = psim0 - psim1;
             double del2 = psim0 - 2.0 * psim1 + psim2;
@@ -1204,7 +1374,7 @@ namespace TrulyRandom
 
             if (pValue1 < 0 || pValue1 > 1 || pValue2 < 0 || pValue2 > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -1222,13 +1392,13 @@ namespace TrulyRandom
                             $"P-value2   = {pValue2:0.####}\n" +
                             $"Time       = {(int)sw.ElapsedMilliseconds} ms";
 
-            return new RawTestResult(new double[] { pValue1, pValue2 }, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue1, pValue2 }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        static double psi2(BitArray data, int blockLength)
+        static double Psi2(BitArray data, int blockLength)
         {
             uint[] P = new uint[(int)Math.Pow(2, blockLength + 1) - 1];
-            //computing frequency
+            //Computing frequency
             for (int i = 0; i < data.Length; i++)
             {
                 int k = 1;
@@ -1256,9 +1426,19 @@ namespace TrulyRandom
             return sum;
         }
 
-        public static RawTestResult ApproximateEntropy(BitArray data, int blockLength)
+        /// <summary>
+        /// As with the Serial test, the focus of this test is the frequency of all possible overlapping
+        /// m-bit patterns across the entire sequence. The purpose of the test is to compare the frequency of
+        /// overlapping blocks of two consecutive/adjacent lengths (m and m+1) against the expected result for a
+        /// random sequence.<br/>
+        /// For more info, see section 2.12 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult ApproximateEntropy(BitArray data, int blockLength)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             if (blockLength < 2) //m < [log2 n]-5
             {
@@ -1319,7 +1499,7 @@ namespace TrulyRandom
 
             if (pValue < 0 || pValue > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -1335,12 +1515,22 @@ namespace TrulyRandom
                             $"P-value    = {pValue:0.####}\n" +
                             $"Time       = {(int)sw.ElapsedMilliseconds} ms";
 
-            return new RawTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult CumulativeSums(BitArray data)
+        /// <summary>
+        /// The focus of this test is the maximal excursion (from zero) of the random walk defined by the cumulative
+        /// sum of adjusted (-1, +1) digits in the sequence.The purpose of the test is to determine whether the
+        /// cumulative sum of the partial sequences occurring in the tested sequence is too large or too small relative
+        /// to the expected behavior of that cumulative sum for random sequences.For a random sequence, the excursions 
+        /// of the random walk should be near zero.<br/>
+        /// For more info, see section 2.13 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult CumulativeSums(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             int S = 0;
             int sup = 0;
@@ -1403,7 +1593,7 @@ namespace TrulyRandom
 
             if (pValue1 < 0 || pValue1 > 1 || pValue2 < 0 || pValue2 > 1)
             {
-                throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                throw new InvalidOperationException("PValue is out of [0, 1] range");
             }
 
             sw.Stop();
@@ -1417,12 +1607,25 @@ namespace TrulyRandom
                             $"P-value (reverse)             = {pValue2:0.####}\n" +
                             $"Time                          = {(int)sw.ElapsedMilliseconds} ms";
 
-            return new RawTestResult(new double[] { pValue1, pValue2 }, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(new double[] { pValue1, pValue2 }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult RandomExcursions(BitArray data)
+        /// <summary>
+        /// The focus of this test is the number of cycles having exactly K visits in a cumulative sum random walk.
+        /// The cumulative sum random walk is derived from partial sums after the(0,1) sequence is transferred to
+        /// the appropriate(-1, +1) sequence.A cycle of a random walk consists of a sequence of steps of unit length
+        /// taken at random that begin at and return to the origin.The purpose of this test is to determine if the
+        /// number of visits to a particular state within a cycle deviates from what one would expect for a random
+        /// sequence.This test is actually a series of eight tests (and conclusions), one test and conclusion for each of
+        /// the states: -4, -3, -2, -1 and +1, +2, +3, +4. <br/>
+        /// Note that for this test it is recommended to keep block size as big as possible to avoid getting an <see cref="TestResultEnum.IncufficientCycles"/> resut.<br/>
+        /// For more info, see section 2.14 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult RandomExcursions(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             int[] stateX = { -4, -3, -2, -1, 1, 2, 3, 4 };
             int[] counter = new int[8];
@@ -1438,7 +1641,7 @@ namespace TrulyRandom
             int[] S_k = new int[data.Length];
 
             //Determine sycles
-            List<int> cycles = new List<int>();
+            List<int> cycles = new();
             cycles.Add(0);
             S_k[0] = data[0] ? 1 : -1;
             for (int i = 1; i < data.Length; i++)
@@ -1455,7 +1658,7 @@ namespace TrulyRandom
             }
             else
             {
-                cycles[cycles.Count - 1] = data.Length;
+                cycles[^1] = data.Length;
             }
 
             double constraint = Math.Max(0.005 * Math.Pow(data.Length, 0.5), 500);
@@ -1469,7 +1672,7 @@ namespace TrulyRandom
             if (cycles.Count < constraint) //chi-squared is invalid under this conditions
             {
                 report += $"Error: insufficient number of cycles. Test is not applicable because Chi^2 is invalid under this conditions. Try increasing sequence length (see 3.14 in the paper for more details)";
-                return new RawTestResult(new double[8], data.Count, report, (int)sw.ElapsedMilliseconds);
+                return new SingleTestResult(new double[8], data.Count, report, (int)sw.ElapsedMilliseconds);
             }
 
             int cycleStart = 0;
@@ -1526,7 +1729,7 @@ namespace TrulyRandom
 
                 if (pValues[i] < 0 || pValues[i] > 1)
                 {
-                    throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                    throw new InvalidOperationException("PValue is out of [0, 1] range");
                 }
             }
 
@@ -1539,12 +1742,22 @@ namespace TrulyRandom
                 pValues.Select(x=>x.ToString("0.####")).ToArray()
             }, 8);
 
-            return new RawTestResult(pValues, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(pValues, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        public static RawTestResult RandomExcursionsVariant(BitArray data)
+        /// <summary>
+        /// The focus of this test is the total number of times that a particular state is visited (i.e., occurs) in a
+        /// cumulative sum random walk. The purpose of this test is to detect deviations from the expected number
+        /// of visits to various states in the random walk. This test is actually a series of eighteen tests (and
+        /// conclusions), one test and conclusion for each of the states: -9, -8, …, -1 and +1, +2, …, +9.<br/>
+        /// Note that for this test it is recommended to keep block size as big as possible to avoid getting an <see cref="TestResultEnum.IncufficientCycles"/> resut.<br/>
+        /// For more info, see section 2.15 of the paper
+        /// </summary>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult RandomExcursionsVariant(BitArray data)
         {
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             int[] stateX = { -9, -8, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             int[] S_k = new int[data.Length];
@@ -1575,7 +1788,7 @@ namespace TrulyRandom
             if (cycles < constraint)
             {
                 report += $"Error: insufficient number of cycles. Test is not applicable because Chi^2 is invalid under this conditions. Try increasing sequence length (see 3.14 in the paper for more details)";
-                return new RawTestResult(new double[18], data.Count, report, (int)sw.ElapsedMilliseconds);
+                return new SingleTestResult(new double[18], data.Count, report, (int)sw.ElapsedMilliseconds);
             }
 
             double[] pValues = new double[18];
@@ -1587,7 +1800,7 @@ namespace TrulyRandom
                 pValues[i] = NistTestUtils.Erfc(Math.Abs(visits[i] - cycles) / Math.Sqrt(2.0 * cycles * (4.0 * Math.Abs(stateX[i]) - 2)));
                 if (pValues[i] < 0 || pValues[i] > 1)
                 {
-                    throw new ArgumentOutOfRangeException("PValue is out of [0, 1] range");
+                    throw new InvalidOperationException("PValue is out of [0, 1] range");
                 }
                 Utils.BreakExecution(ref lastBreak);
             }
@@ -1601,7 +1814,7 @@ namespace TrulyRandom
                 visits.Select(x=>x.ToString("0.####")).ToArray(),
                 pValues.Select(x=>x.ToString("0.####")).ToArray()
             }, 8);
-            return new RawTestResult(pValues, data.Count, report, (int)sw.ElapsedMilliseconds);
+            return new SingleTestResult(pValues, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
     }
 }
