@@ -35,7 +35,7 @@ namespace TrulyRandom.Modules
         /// <summary>
         /// Directory in which buffer files will be located
         /// </summary>
-        public string BufferDirectory = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "RandomnessBuffer";
+        public string BufferDirectory { get; set; } = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "RandomnessBuffer";
         /// <summary>
         /// Determines whether data block should be taken from all available sources and concatenated (<c>true</c>), or from one source if possible (<c>false</c>)
         /// </summary>

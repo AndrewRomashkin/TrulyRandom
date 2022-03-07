@@ -10,13 +10,14 @@ namespace TrulyRandom
     //Source: NIST Statistical Testing Suite, NIST Special Publication 800-22
     public partial class NistTests
     {
-        /// <summary>
-        /// The focus of the test is the proportion of zeroes and ones for the entire sequence.
-        /// The purpose of this test is to determine whether the number of ones and zeros in a sequence are approximately
-        /// the same as wouldbe expected for a truly random sequence. The test assesses the closeness of the fraction of
-        /// ones to ½, that is, the number of ones and zeroes in a sequence should be about the same.<br/>
-        /// For more info, see section 2.1 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="Frequency"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult Frequency(byte[] data)
+        {
+            return Frequency(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="Frequency"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult Frequency(BitArray data)
@@ -49,12 +50,15 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of the test is the proportion of ones within M-bit blocks.
-        /// The purpose of this test is to determine whether the frequency of ones in an M-bit block is approximately M/2, 
-        /// as would be expected under an assumption of randomness.<br/>
-        /// For more info, see section 2.2 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="BlockFrequency"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult BlockFrequency(byte[] data, int blockLength)
+        {
+            return BlockFrequency(new BitArray(data), blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="BlockFrequency"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
         /// <returns>Test result</returns>
@@ -105,14 +109,14 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, blockLength * blockCount, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the total number of runs in the sequence, where a run is an uninterrupted sequence
-        /// of identical bits. A run of length k consists of exactly k identical bits and is bounded before and after with
-        /// a bit of the opposite value. The purpose of the runs test is to determine whether the number of runs of
-        /// ones and zeros of various lengths is as expected for a random sequence. In particular, this test determines
-        /// whether the oscillation between such zeros and ones is too fast or too slow.<br/>
-        /// For more info, see section 2.3 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="Runs"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult Runs(byte[] data)
+        {
+            return Runs(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="Runs"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult Runs(BitArray data)
@@ -170,12 +174,14 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of the test is the longest run of ones within M-bit blocks. The purpose of this test is to
-        /// determine whether the length of the longest run of ones within the tested sequence is consistent with the
-        /// length of the longest run of ones that would be expected in a random sequence.<br/>
-        /// For more info, see section 2.4 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="LongestRunOfOnes"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult LongestRunOfOnes(byte[] data)
+        {
+            return LongestRunOfOnes(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="LongestRunOfOnes"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult LongestRunOfOnes(BitArray data)
@@ -294,11 +300,15 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, blockCount * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of the test is the rank of disjoint sub-matrices of the entire sequence. The purpose of this test is
-        /// to check for linear dependence among fixed length substrings of the original sequence.<br/>
-        /// For more info, see section 2.5 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="BinaryMatrixRank"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="matrixSize">Size of a single matrix (-1 for autoselection). Matrices are square, so they contain matrixSize^2 elements</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult BinaryMatrixRank(byte[] data, int matrixSize)
+        {
+            return BinaryMatrixRank(new BitArray(data), matrixSize);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="BinaryMatrixRank"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="matrixSize">Size of a single matrix (-1 for autoselection). Matrices are square, so they contain matrixSize^2 elements</param>
         /// <returns>Test result</returns>
@@ -389,12 +399,14 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, matrixCount * matrixSize * matrixSize, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the peak heights in the Discrete Fourier Transform of the sequence. The purpose
-        /// of this test is to detect periodic features (i.e., repetitive patterns that are near each other) in the tested
-        /// sequence that would indicate a deviation from the assumption of randomness.<br/>
-        /// For more info, see section 2.6 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="DiscreteFourierTransform"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult DiscreteFourierTransform(byte[] data)
+        {
+            return DiscreteFourierTransform(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="DiscreteFourierTransform"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult DiscreteFourierTransform(BitArray data)
@@ -481,14 +493,16 @@ namespace TrulyRandom
             return result.ToArray();
         }
 
-        /// <summary>
-        /// The focus of this test is the number of occurrences of pre-specified target strings. The purpose of this
-        /// test is to detect generators that produce too many occurrences of a given non-periodic (aperiodic) pattern.
-        /// For this test and for the Overlapping Template Matching test of Section 2.8, an m-bit window is used to
-        /// search for a specific m-bit pattern. If the pattern is not found, the window slides one bit position. If the
-        /// pattern is found, the window is reset to the bit after the found pattern, and the search resumes.<br/>
-        /// For more info, see section 2.7 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="NonOverlappingTemplateMatchings"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templates">An array of templates to be used for testing (null for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult NonOverlappingTemplateMatchings(byte[] data, BitArray[] templates, int blockLength)
+        {
+            return NonOverlappingTemplateMatchings(new BitArray(data), templates, blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="NonOverlappingTemplateMatchings"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="templates">An array of templates to be used for testing (null for autoselection)</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
@@ -585,14 +599,16 @@ namespace TrulyRandom
             return new SingleTestResult(results.Select(x => x.PValue).ToArray(), data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the number of occurrences of pre-specified target strings. The purpose of this
-        /// test is to detect generators that produce too many occurrences of a given non-periodic (aperiodic) pattern.
-        /// For this test and for the Overlapping Template Matching test of Section 2.8, an m-bit window is used to
-        /// search for a specific m-bit pattern. If the pattern is not found, the window slides one bit position. If the
-        /// pattern is found, the window is reset to the bit after the found pattern, and the search resumes.<br/>
-        /// For more info, see section 2.7 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="NonOverlappingTemplateMatchings"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templateLength">Length of the templates to be used (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult NonOverlappingTemplateMatchings(byte[] data, int templateLength, int blockLength)
+        {
+            return NonOverlappingTemplateMatchings(new BitArray(data), templateLength, blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="NonOverlappingTemplateMatchings"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="templateLength">Length of the templates to be used (-1 for autoselection)</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
@@ -657,14 +673,16 @@ namespace TrulyRandom
             return new SingleTestResult(results.Select(x => x.PValue).ToArray(), data.Length / blockLength * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the number of occurrences of pre-specified target strings. The purpose of this
-        /// test is to detect generators that produce too many occurrences of a given non-periodic (aperiodic) pattern.
-        /// For this test and for the Overlapping Template Matching test of Section 2.8, an m-bit window is used to
-        /// search for a specific m-bit pattern. If the pattern is not found, the window slides one bit position. If the
-        /// pattern is found, the window is reset to the bit after the found pattern, and the search resumes.<br/>
-        /// For more info, see section 2.7 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="NonOverlappingTemplateMatchings"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="template">Template to be used</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult NonOverlappingTemplateMatchings(byte[] data, BitArray template, int blockLength)
+        {
+            return NonOverlappingTemplateMatchings(new BitArray(data), template, blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="NonOverlappingTemplateMatchings"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="template">Template to be used</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
@@ -782,14 +800,17 @@ namespace TrulyRandom
         #endregion Non-overlapping template matchings
 
         #region Overlapping template matchings
-        /// <summary>
-        /// The focus of the Overlapping Template Matching test is the number of occurrences of pre-specified target
-        /// strings. Both this test and the Non-overlapping Template Matching use an m-bit window to search 
-        /// for a specific m-bit pattern. As with the Non-overlapping Template Matching test, if the pattern is not found,
-        /// the window slides one bit position. The difference between this test and the test in Section 2.7 is that
-        /// when the pattern is found, the window slides only one bit before resuming the search.<br/>
-        /// For more info, see section 2.8 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="OverlappingTemplateMatchings"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templateLength">Length of the template to be used (-1 for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult OverlappingTemplateMatchings(byte[] data, int templateLength, int degreesOfFreedom, int blockLength)
+        {
+            return OverlappingTemplateMatchings(new BitArray(data), templateLength, degreesOfFreedom, blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="OverlappingTemplateMatchings"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="templateLength">Length of the template to be used (-1 for autoselection)</param>
         /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
@@ -804,14 +825,17 @@ namespace TrulyRandom
             return OverlappingTemplateMatchings(data, new BitArray(Enumerable.Repeat(true, templateLength).ToArray()), degreesOfFreedom, blockLength);
         }
 
-        /// <summary>
-        /// The focus of the Overlapping Template Matching test is the number of occurrences of pre-specified target
-        /// strings. Both this test and the Non-overlapping Template Matching use an m-bit window to search 
-        /// for a specific m-bit pattern. As with the Non-overlapping Template Matching test, if the pattern is not found,
-        /// the window slides one bit position. The difference between this test and the test in Section 2.7 is that
-        /// when the pattern is found, the window slides only one bit before resuming the search.<br/>
-        /// For more info, see section 2.8 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="OverlappingTemplateMatchings"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="templates">Templates to be used (null for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult OverlappingTemplateMatchings(byte[] data, BitArray[] templates, int degreesOfFreedom, int blockLength)
+        {
+            return OverlappingTemplateMatchings(new BitArray(data), templates, degreesOfFreedom, blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="OverlappingTemplateMatchings"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="templates">Templates to be used (null for autoselection)</param>
         /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
@@ -883,14 +907,17 @@ namespace TrulyRandom
             return new SingleTestResult(results.Select(x => x.PValue).ToArray(), Enumerable.Range(0, templates.Length).Select(i => data.Length / blockLengths[i] * blockLengths[i]).Min(), report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of the Overlapping Template Matching test is the number of occurrences of pre-specified target
-        /// strings. Both this test and the Non-overlapping Template Matching use an m-bit window to search 
-        /// for a specific m-bit pattern. As with the Non-overlapping Template Matching test, if the pattern is not found,
-        /// the window slides one bit position. The difference between this test and the test in Section 2.7 is that
-        /// when the pattern is found, the window slides only one bit before resuming the search.<br/>
-        /// For more info, see section 2.8 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="OverlappingTemplateMatchings"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="template">Template to be used (-1 for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult OverlappingTemplateMatchings(byte[] data, BitArray template, int degreesOfFreedom, int blockLength)
+        {
+            return OverlappingTemplateMatchings(new BitArray(data), template, degreesOfFreedom, blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="OverlappingTemplateMatchings"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="template">Template to be used (-1 for autoselection)</param>
         /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
@@ -1030,13 +1057,16 @@ namespace TrulyRandom
         }
         #endregion Overlapping template matchings
 
-        /// <summary>
-        /// The focus of this test is the number of bits between matching patterns (a measure that is related to the
-        /// length of a compressed sequence). The purpose of the test is to detect whether or not the sequence can be
-        /// significantly compressed without loss of information. A significantly compressible sequence is
-        /// considered to be non-random.<br/>
-        /// For more info, see section 2.9 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="MaurersUniversal"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <param name="initializationBlocks">A number of blocks used to initialize the table (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult MaurersUniversal(byte[] data, int blockLength, int initializationBlocks)
+        {
+            return MaurersUniversal(new BitArray(data), blockLength, initializationBlocks);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="MaurersUniversal"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
         /// <param name="initializationBlocks">A number of blocks used to initialize the table (-1 for autoselection)</param>
@@ -1160,12 +1190,16 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, (blockCount + initializationBlocks) * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the length of a linear feedback shift register (LFSR). The purpose of this test is to
-        /// determine whether or not the sequence is complex enough to be considered random. Random sequences
-        /// are characterized by longer LFSRs. An LFSR that is too short implies non-randomness.<br/>
-        /// For more info, see section 2.10 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="LinearComplexity"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult LinearComplexity(byte[] data, int blockLength, int degreesOfFreedom)
+        {
+            return LinearComplexity(new BitArray(data), blockLength, degreesOfFreedom);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="LinearComplexity"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
         /// <param name="degreesOfFreedom">Degrees of freedom of the chi-squared distribution (-1 for autoselection)</param>
@@ -1340,14 +1374,15 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, blockCount * blockLength, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the frequency of all possible overlapping m-bit patterns across the entire
-        /// sequence. The purpose of this test is to determine whether the number of occurrences of the 2m m-bit
-        /// overlapping patterns is approximately the same as would be expected for a random sequence. Random
-        /// sequences have uniformity; that is, every m-bit pattern has the same chance of appearing as every other
-        /// m-bit pattern.<br/>
-        /// For more info, see section 2.11 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="Serial"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult Serial(byte[] data, int blockLength)
+        {
+            return Serial(new BitArray(data), blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="Serial"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
         /// <returns>Test result</returns>
@@ -1426,13 +1461,15 @@ namespace TrulyRandom
             return sum;
         }
 
-        /// <summary>
-        /// As with the Serial test, the focus of this test is the frequency of all possible overlapping
-        /// m-bit patterns across the entire sequence. The purpose of the test is to compare the frequency of
-        /// overlapping blocks of two consecutive/adjacent lengths (m and m+1) against the expected result for a
-        /// random sequence.<br/>
-        /// For more info, see section 2.12 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="ApproximateEntropy"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult ApproximateEntropy(byte[] data, int blockLength)
+        {
+            return ApproximateEntropy(new BitArray(data), blockLength);
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="ApproximateEntropy"]'/>
         /// <param name="data">Data to be tested</param>
         /// <param name="blockLength">Length of a single block (-1 for autoselection)</param>
         /// <returns>Test result</returns>
@@ -1518,14 +1555,14 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the maximal excursion (from zero) of the random walk defined by the cumulative
-        /// sum of adjusted (-1, +1) digits in the sequence.The purpose of the test is to determine whether the
-        /// cumulative sum of the partial sequences occurring in the tested sequence is too large or too small relative
-        /// to the expected behavior of that cumulative sum for random sequences.For a random sequence, the excursions 
-        /// of the random walk should be near zero.<br/>
-        /// For more info, see section 2.13 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="CumulativeSums"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult CumulativeSums(byte[] data)
+        {
+            return CumulativeSums(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="CumulativeSums"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult CumulativeSums(BitArray data)
@@ -1610,17 +1647,14 @@ namespace TrulyRandom
             return new SingleTestResult(new double[] { pValue1, pValue2 }, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the number of cycles having exactly K visits in a cumulative sum random walk.
-        /// The cumulative sum random walk is derived from partial sums after the(0,1) sequence is transferred to
-        /// the appropriate(-1, +1) sequence.A cycle of a random walk consists of a sequence of steps of unit length
-        /// taken at random that begin at and return to the origin.The purpose of this test is to determine if the
-        /// number of visits to a particular state within a cycle deviates from what one would expect for a random
-        /// sequence.This test is actually a series of eight tests (and conclusions), one test and conclusion for each of
-        /// the states: -4, -3, -2, -1 and +1, +2, +3, +4. <br/>
-        /// Note that for this test it is recommended to keep block size as big as possible to avoid getting an <see cref="TestResultEnum.IncufficientCycles"/> resut.<br/>
-        /// For more info, see section 2.14 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="RandomExcursions"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult RandomExcursions(byte[] data)
+        {
+            return RandomExcursions(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="RandomExcursions"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult RandomExcursions(BitArray data)
@@ -1745,14 +1779,14 @@ namespace TrulyRandom
             return new SingleTestResult(pValues, data.Count, report, (int)sw.ElapsedMilliseconds);
         }
 
-        /// <summary>
-        /// The focus of this test is the total number of times that a particular state is visited (i.e., occurs) in a
-        /// cumulative sum random walk. The purpose of this test is to detect deviations from the expected number
-        /// of visits to various states in the random walk. This test is actually a series of eighteen tests (and
-        /// conclusions), one test and conclusion for each of the states: -9, -8, …, -1 and +1, +2, …, +9.<br/>
-        /// Note that for this test it is recommended to keep block size as big as possible to avoid getting an <see cref="TestResultEnum.IncufficientCycles"/> resut.<br/>
-        /// For more info, see section 2.15 of the paper
-        /// </summary>
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="RandomExcursionsVariant"]'/>
+        /// <param name="data">Data to be tested</param>
+        /// <returns>Test result</returns>
+        public static SingleTestResult RandomExcursionsVariant(byte[] data)
+        {
+            return RandomExcursionsVariant(new BitArray(data));
+        }
+        /// <include file='NistDocumentation.xml' path='NistDocs/Func[@name="RandomExcursionsVariant"]'/>
         /// <param name="data">Data to be tested</param>
         /// <returns>Test result</returns>
         public static SingleTestResult RandomExcursionsVariant(BitArray data)
