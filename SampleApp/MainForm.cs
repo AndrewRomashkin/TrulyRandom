@@ -443,5 +443,10 @@ namespace SampleApp
                 results.Text = e1.Message;
             }
         }
+
+        private void bufferClear_Click(object sender, EventArgs e)
+        {
+            buffer.ClearBuffer();
+        }
     }
 }

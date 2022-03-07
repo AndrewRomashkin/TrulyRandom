@@ -9,7 +9,7 @@ namespace TrulyRandom.Modules.Extractors
     /// </summary>
     public class ShuffleExtractor : Extractor, ISeedable
     {
-        int blockSize = 10_000;
+        int blockSize = 3;
         /// <summary>
         /// Block of bytes, moved together. It is recommended to use sizes as small as possible and coprime with next extractor block size (for example, hash input block size or other ShuffleExtractor block size).
         /// </summary>

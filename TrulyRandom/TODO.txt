@@ -1,8 +1,10 @@
-﻿1. Documentation
-2. Compress video stream via DirectShow
-3. Save tester state
-4. Test every N-th block
-5. Correct maximum amount of threads
-6. Restrict testing for too short sequences
-7. Test even with insufficient cycles
-8. Temporarily disable testing
+﻿1. Compress video stream via DirectShow
+2. Save tester state
+3. Test every N-th block
+4. Correct maximum amount of threads
+5. Restrict testing for too short sequences
+6. Test even with insufficient cycles
+7. Temporarily disable testing
+8. String generator
+9. Normal distribution
+10. XOR extractor

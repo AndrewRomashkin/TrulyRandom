@@ -451,6 +451,7 @@ namespace TrulyRandom.Models
             lock (Sync)
             {
                 buffer.Clear();
+                CheckForOverflow();
             }
         }
 
