@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TrulyRandom")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A .NET library for generating and testing truly random data using consumer hardware. Includes easy-to-use implementation of the NIST SP 800-22 test library. No external dependencies.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TrulyRandom")]
