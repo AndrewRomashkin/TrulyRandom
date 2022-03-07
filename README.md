@@ -1,5 +1,5 @@
 # TrulyRandom
-A powerful .NET library for generating and testing high-quality truly random data using consumer hardware (Windows only). Includes easy-to-use implementation of the NIST NIST SP 800-22 test library. No external dependencies.
+A powerful .NET library for generating and testing high-quality truly random data using consumer hardware (generation is available only for Windows). Includes easy-to-use implementation of the NIST NIST SP 800-22 test library. No external dependencies.
 
 The library allows developers to retrieve low-entropy data from microphones, cameras and user input (mouse and keyboard), process this low-entropy data into high-entropy using different randomness extractors, test it using a library of tests defined in NIST SP 800-22, store and retrieve it and finally use it to get random data of various types:
 
