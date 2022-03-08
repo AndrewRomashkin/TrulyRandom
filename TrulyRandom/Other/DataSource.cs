@@ -289,6 +289,47 @@ namespace TrulyRandom
             return (int)GetUInt((uint)(maxValue - minValue)) + minValue;
         }
 
+
+        /// <summary>
+        /// Gets a random double in a range between 0 and 1
+        /// </summary>
+        /// <param name="including0">Specifies whether 0 should be incuded</param>
+        /// <param name="including1">Specifies whether 1 should be incuded</param>
+        /// <returns>Random double</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        public double GetDouble(bool including0 = true, bool including1 = false)
+        {
+            return GetInt(including0 ? 0 : 1, including1 ? int.MaxValue : int.MaxValue - 1) * (1.0 / int.MaxValue);
+        }
+
+        /// <summary>
+        /// Gets a random double in a range between 0 and 1 (inclusive)
+        /// </summary>
+        /// <param name="minValue">Lower bound</param>
+        /// <param name="maxValue">Upper bound</param>
+        /// <param name="includingMin">Specifies whether minValue should be incuded</param>
+        /// <param name="includingMax">Specifies whether maxValue should be incuded</param>
+        /// <returns>Random double</returns>
+        /// <exception cref="OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        public double GetDouble(double minValue, double maxValue, bool includingMin = true, bool includingMax = false)
+        {
+            return GetDouble(includingMin, includingMax) * (maxValue - minValue) + minValue;
+        }
+
+        /// <summary>
+        /// Gets a random double that follows Gaussian (normal) distribution
+        /// </summary>
+        /// <param name="mean">Mean value</param>
+        /// <param name="stdDev">Standard deviation</param>
+        /// <returns></returns>
+        public double GetNormal(double mean, double stdDev)
+        {
+            double u1 = 1.0 - GetDouble(true, false);
+            double u2 = 1.0 - GetDouble(true, false);
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+            return mean + stdDev * randStdNormal;
+        }
+
         /// <summary>
         /// Randomly shuffles specified array using Fisher–Yates algorithm
         /// </summary>

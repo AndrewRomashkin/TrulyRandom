@@ -574,7 +574,7 @@ namespace TrulyRandom.Models
                 activityIntervals.Add(new Interval(DateTime.Now, DateTime.MaxValue));
             }
 
-            if (thread != null && thread.ThreadState == ThreadState.Unstarted)
+            if (thread != null && (thread.ThreadState & ThreadState.Unstarted) == ThreadState.Unstarted)
             {
                 thread.Start();
             }
@@ -628,6 +628,14 @@ namespace TrulyRandom.Models
             {
                 OverflowPause = false;
             }
+        }
+
+        /// <summary>
+        /// Finalizes the object
+        /// </summary>
+        ~Module()
+        {
+            Dispose();
         }
     }
 }

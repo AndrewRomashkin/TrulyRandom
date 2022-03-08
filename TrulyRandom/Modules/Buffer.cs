@@ -48,6 +48,7 @@ namespace TrulyRandom.Modules
         {
             overflowHysteresis = 0.95;
             thread = new Thread(WorkerThread);
+            thread.IsBackground = true;
             thread.Name = Name;
         }
 

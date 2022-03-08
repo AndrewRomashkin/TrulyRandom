@@ -2,13 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UseWindowsForms>False</UseWindowsForms>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
     <RootNamespace>TrulyRandom</RootNamespace>
     <AssemblyName>TrulyRandom</AssemblyName>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>Romashkin Andrew</Authors>
     <Company>$(Authors)</Company>
@@ -17,11 +16,12 @@
     <PackageProjectUrl>https://github.com/RomashkinAndrew/TrulyRandom</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/RomashkinAndrew/TrulyRandom</RepositoryUrl>
-    <PackageTags>random;randomness;random nubers;random number testing;nist</PackageTags>
+    <PackageTags>random;randomness;random number testing;nist</PackageTags>
     <AssemblyVersion>$(AssemblyVersion)</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>0.7.0</Version>
+    <Version>0.7.1</Version>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,6 +34,10 @@
 
   <ItemGroup>
     <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\TrulyRandom\Other\icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

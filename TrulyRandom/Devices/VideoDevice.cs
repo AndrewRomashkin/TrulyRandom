@@ -76,7 +76,7 @@ namespace TrulyRandom.Devices
         /// <returns>Unique thread name</returns>
         private protected override string GetThreadName()
         {
-            return "Video device thread: " + Name;
+            return "Video device: " + Name;
         }
 
         //Members specific for video devices:

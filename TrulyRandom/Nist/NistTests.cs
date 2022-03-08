@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TrulyRandom
@@ -154,6 +155,7 @@ namespace TrulyRandom
             {
                 actions.Add(() =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     SingleTestResult rawTestResult = DiscreteFourierTransform(data);
                     lock (testHistory)
                     {
@@ -169,6 +171,7 @@ namespace TrulyRandom
             {
                 actions.Add(() =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     SingleTestResult rawTestResult;
                     if (Parameters.NonOverlappingTemplateMatchings.Templates != null && Parameters.NonOverlappingTemplateMatchings.Templates.Length > 0)
                     {
@@ -197,6 +200,7 @@ namespace TrulyRandom
             {
                 actions.Add(() =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     SingleTestResult rawTestResult = LinearComplexity(data, Parameters.LinearComplexity.BlockLength, Parameters.LinearComplexity.DegreesOfFreedom);
 
                     lock (testHistory)
@@ -213,6 +217,7 @@ namespace TrulyRandom
             {
                 actions.Add(() =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     SingleTestResult rawTestResult;
                     foreach (TestsEnum test in (testsToPerform & ~TestsEnum.DiscreteFourierTransform & ~TestsEnum.NonOverlappingTemplateMatchings
                         & ~TestsEnum.LinearComplexity).EnumerateFlags())
