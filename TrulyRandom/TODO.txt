@@ -1,10 +1,9 @@
 ﻿1. Compress video stream via DirectShow
 2. Save tester state
 3. Test every N-th block
-4. Correct maximum amount of threads
-5. Restrict testing for too short sequences
-6. Test even with insufficient cycles
-7. Temporarily disable testing
-8. String generator
-9. Normal distribution
-10. XOR extractor
+4. Restrict testing for too short sequences
+5. Test even with insufficient cycles
+6. Temporarily disable testing
+7. String generator
+8. XOR extractor
+9. Tests for XORSHIFT and LCG generators

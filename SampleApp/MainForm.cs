@@ -248,8 +248,14 @@ namespace SampleApp
             bufferCurrent.Text = $"{Utils.FormatBytes(buffer.BytesInBuffer)}";
             bufferCurrentBar.Value = (int)(buffer.BufferState * 100);
 
-            videoPause.Text = videoSource.Started ? "Pause" : "Start";
-            audioPause.Text = audioSource.Started ? "Pause" : "Start";
+            if (videoSource != null)
+            {
+                videoPause.Text = videoSource.Started ? "Pause" : "Start";
+            }
+            if (audioSource != null)
+            {
+                audioPause.Text = audioSource.Started ? "Pause" : "Start";
+            }
             biologicalPause.Text = biologicalSource.Started ? "Pause" : "Start";
             deflate1Pause.Text = deflateExtractor1.Started ? "Pause" : "Start";
             deflate2Pause.Text = deflateExtractor2.Started ? "Pause" : "Start";
@@ -447,6 +453,18 @@ namespace SampleApp
         private void bufferClear_Click(object sender, EventArgs e)
         {
             buffer.ClearBuffer();
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            refreshTimer.Stop();
+            biologicalSource.Dispose();
+            deflateExtractor1.Dispose();
+            deflateExtractor2.Dispose();
+            shuffleExtractor.Dispose();
+            hashExtractor.Dispose();
+            tester.Dispose();
+            buffer.Dispose();
         }
     }
 }

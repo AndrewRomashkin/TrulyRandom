@@ -18,6 +18,7 @@ namespace TrulyRandom.Modules.Sources
         public BiologicalSource()
         {
             thread = new Thread(new ThreadStart(WorkerThread));
+            thread.IsBackground = true;
             thread.Name = Name;
         }
 

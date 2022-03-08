@@ -64,6 +64,8 @@ namespace TrulyRandom.Models
         public Extractor()
         {
             thread = new Thread(WorkerThread);
+            thread.IsBackground = true;
+            thread.Priority = ThreadPriority.Lowest;
             thread.Name = Name;
         }
 

@@ -81,7 +81,7 @@ namespace TrulyRandom.Devices
         /// <returns>Unique thread name</returns>
         private protected override string GetThreadName()
         {
-            return "Audio device thread: " + Name;
+            return "Audio device: " + Name;
         }
 
         //Members specific for audio devices:

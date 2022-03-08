@@ -101,7 +101,7 @@ namespace TrulyRandom.Devices
                 return;
             }
             run = true;
-            if (thread.ThreadState == ThreadState.Unstarted)
+            if ((thread.ThreadState & ThreadState.Unstarted) == ThreadState.Unstarted)
             {
                 thread.Start();
             }
@@ -122,7 +122,7 @@ namespace TrulyRandom.Devices
         {
             GC.SuppressFinalize(this);
             dispose = true;
-            if (thread == null || thread.ThreadState == ThreadState.Unstarted)
+            if (thread == null || (thread.ThreadState & ThreadState.Unstarted) == ThreadState.Unstarted)
             {
                 ReleaseDevice(monikerString);
                 disposed = true;
@@ -269,7 +269,7 @@ namespace TrulyRandom.Devices
         /// </summary>
         public DirectShowDevice(string name, string monikerString)
         {
-            this.Name = name;
+            Name = name;
             this.monikerString = monikerString;
             Initialize();
         }
@@ -281,6 +281,7 @@ namespace TrulyRandom.Devices
                 throw new ArgumentException("This device is already in use");
             }
             thread = new(new ThreadStart(WorkerThread));
+            thread.IsBackground = true;
             thread.Name = GetThreadName();
         }
 

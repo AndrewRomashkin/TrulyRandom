@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 // Source: Maht.NET
@@ -24,9 +25,10 @@ namespace TrulyRandom.Nist
             Complex[] b = new Complex[m];
             Complex[] a = new Complex[m];
 
-            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = threads },
+            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = threads  },
                 () =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     DateTime lastBreak1 = DateTime.Now;
                     // Build and transform padded sequence b_k = exp(I*Pi*k^2/N)
                     for (int i = 0; i < samples.Length; i++)
@@ -45,6 +47,7 @@ namespace TrulyRandom.Nist
                 },
                 () =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     DateTime lastBreak1 = DateTime.Now;
                     // Build and transform padded sequence a_k = x_k * exp(-I*Pi*k^2/N)
                     for (int i = 0; i < samples.Length; i++)
@@ -154,6 +157,7 @@ namespace TrulyRandom.Nist
 
                 Utils.ParallelFor(0, size, 64, threads, (u, v) =>
                 {
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                     DateTime lastBreak1 = DateTime.Now;
                     for (int i = u; i < v; i++)
                     {

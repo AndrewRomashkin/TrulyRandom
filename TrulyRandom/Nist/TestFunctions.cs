@@ -524,6 +524,7 @@ namespace TrulyRandom
 
             Utils.ParallelFor(0, templates.Length, 1, MaximumThreads, (u, v) =>
             {
+                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                 results[u] = NonOverlappingTemplateMatchingsInternal(data, templates[u], blockLength);
             });
 
@@ -632,6 +633,7 @@ namespace TrulyRandom
 
             Utils.ParallelFor(0, templates.Length, 1, MaximumThreads, (u, v) =>
             {
+                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                 results[u] = NonOverlappingTemplateMatchingsInternal(data, templates[u], blockLength);
             });
 
@@ -864,6 +866,7 @@ namespace TrulyRandom
 
             Utils.ParallelFor(0, templates.Length, 1, MaximumThreads, (u, v) =>
             {
+                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                 if (blockLengths[u] < templates[u].Length)
                 {
                     blockLengths[u] = (int)Math.Pow(2, templates[u].Length + 1) + templates[u].Length - 1;
@@ -1245,6 +1248,7 @@ namespace TrulyRandom
 
             Utils.ParallelFor(0, blockCount, 10, MaximumThreads, (u, v) =>
             {
+                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                 DateTime lastBreak = DateTime.Now;
                 for (int block = u; block < v; block++)
                 {

@@ -313,16 +313,17 @@ namespace TrulyRandom
         }
 
         /// <summary>
-        /// Ensures that execution of the method will be interrupted from time to time to ensure that other threads and processes get some processor time. This prevents computer from lagging while executing some long task
+        /// Ensures that execution of the method will be interrupted from time to time to ensure that other threads and processes get some processor time. 
+        /// This prevents computer from lagging while executing some long task
         /// </summary>
         /// <param name="lastBreak">Variable that holds last break time for the current thread</param>
         internal static void BreakExecution(ref DateTime lastBreak)
         {
-            if (lastBreak.WasAgo(100))
-            {
-                System.Threading.Thread.Sleep(1);
-                lastBreak = DateTime.Now;
-            }
+        //    if (lastBreak.WasAgo(100))
+        //    {
+        //        System.Threading.Thread.Sleep(1);
+        //        lastBreak = DateTime.Now;
+        //    }
         }
     }
 }

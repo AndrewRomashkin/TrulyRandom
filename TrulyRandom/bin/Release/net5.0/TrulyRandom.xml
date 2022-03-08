@@ -2888,6 +2888,11 @@
             Pauses the module in case of overflow and unpauses otherwise
             </summary>
         </member>
+        <member name="M:TrulyRandom.Models.Module.Finalize">
+            <summary>
+            Finalizes the object
+            </summary>
+        </member>
         <member name="T:TrulyRandom.Models.Source">
             <summary>
             Base class for all sources - modules that retrieve entropy from the physical world and feed it to extractors
@@ -5142,6 +5147,34 @@
             <exception cref="T:TrulyRandom.OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
             <exception cref="T:System.ArgumentException">Thrown if bounds are specified incorrectly</exception>
         </member>
+        <member name="M:TrulyRandom.DataSource.GetDouble(System.Boolean,System.Boolean)">
+            <summary>
+            Gets a random double in a range between 0 and 1
+            </summary>
+            <param name="including0">Specifies whether 0 should be incuded</param>
+            <param name="including1">Specifies whether 1 should be incuded</param>
+            <returns>Random double</returns>
+            <exception cref="T:TrulyRandom.OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        </member>
+        <member name="M:TrulyRandom.DataSource.GetDouble(System.Double,System.Double,System.Boolean,System.Boolean)">
+            <summary>
+            Gets a random double in a range between 0 and 1 (inclusive)
+            </summary>
+            <param name="minValue">Lower bound</param>
+            <param name="maxValue">Upper bound</param>
+            <param name="includingMin">Specifies whether minValue should be incuded</param>
+            <param name="includingMax">Specifies whether maxValue should be incuded</param>
+            <returns>Random double</returns>
+            <exception cref="T:TrulyRandom.OutOfRandomnessException">Thrown if there is not enough data in the buffer</exception>
+        </member>
+        <member name="M:TrulyRandom.DataSource.GetNormal(System.Double,System.Double)">
+            <summary>
+            Gets a random double that follows Gaussian (normal) distribution
+            </summary>
+            <param name="mean">Mean value</param>
+            <param name="stdDev">Standard deviation</param>
+            <returns></returns>
+        </member>
         <member name="M:TrulyRandom.DataSource.Shuffle``1(``0[])">
             <summary>
             Randomly shuffles specified array using Fisher–Yates algorithm
@@ -5257,7 +5290,8 @@
         </member>
         <member name="M:TrulyRandom.Utils.BreakExecution(System.DateTime@)">
             <summary>
-            Ensures that execution of the method will be interrupted from time to time to ensure that other threads and processes get some processor time. This prevents computer from lagging while executing some long task
+            Ensures that execution of the method will be interrupted from time to time to ensure that other threads and processes get some processor time. 
+            This prevents computer from lagging while executing some long task
             </summary>
             <param name="lastBreak">Variable that holds last break time for the current thread</param>
         </member>
