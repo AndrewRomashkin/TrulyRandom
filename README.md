@@ -71,3 +71,5 @@ And finally it provides a number of additional features:
 10. Still image detection;
 11. Generation of different types of random data from the collected entropy;
 12. Additional utilites like random array shuffle.
+
+Please, if you find this library useful (or useless) or you have any other suggestions or comments - don't hesitate to contact me.
