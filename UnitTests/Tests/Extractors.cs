@@ -41,6 +41,7 @@ namespace UnitTests
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
             DeflateExtractor extractor = new();
             extractor.BatchSize = 5000;
+            extractor.CalculateEntropy = true;
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -83,6 +84,7 @@ namespace UnitTests
             Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
 
             VonNeumannExtractor extractor = new();
+            extractor.CalculateEntropy = true;
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -130,6 +132,7 @@ namespace UnitTests
             extractor.BatchSize = 5000;
             extractor.HashFunction = HashExtractor.HashFunctionEnum.SHA512;
             extractor.InputBlockSize = 125; //Exactly 1000 blocks, 1000 bits each
+            extractor.CalculateEntropy = true;
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -180,6 +183,7 @@ namespace UnitTests
             ShuffleExtractor extractor = new();
             extractor.BlockSize = 1000;
             extractor.BatchSize = 125000;
+            extractor.CalculateEntropy = true;
             extractor.AddSource(buffer);
             extractor.Start();
 
@@ -204,6 +208,7 @@ namespace UnitTests
             ShuffleExtractor extractor = new();
             extractor.BlockSize = 1;
             extractor.BatchSize = 125000;
+            extractor.CalculateEntropy = true;
             extractor.AddSource(buffer);
             extractor.Start();
 

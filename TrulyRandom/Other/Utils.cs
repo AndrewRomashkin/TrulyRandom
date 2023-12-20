@@ -319,11 +319,11 @@ namespace TrulyRandom
         /// <param name="lastBreak">Variable that holds last break time for the current thread</param>
         internal static void BreakExecution(ref DateTime lastBreak)
         {
-        //    if (lastBreak.WasAgo(100))
-        //    {
-        //        System.Threading.Thread.Sleep(1);
-        //        lastBreak = DateTime.Now;
-        //    }
+            if (lastBreak.WasAgo(100))
+            {
+                System.Threading.Thread.Sleep(1);
+                lastBreak = DateTime.Now;
+            }
         }
     }
 }

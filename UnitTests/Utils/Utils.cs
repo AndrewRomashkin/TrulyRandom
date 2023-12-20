@@ -9,7 +9,7 @@ namespace UnitTests
     {
         internal static BitArray ToBitArray(this string data)
         {
-            List<bool> result = new List<bool>();
+            List<bool> result = new();
 
             foreach (char ch in data)
             {
@@ -40,7 +40,7 @@ namespace UnitTests
 
         internal static BitArray ToBitArray(this int[] data)
         {
-            List<bool> result = new List<bool>();
+            List<bool> result = new();
 
             foreach (int bit in data)
             {
@@ -89,7 +89,7 @@ namespace UnitTests
 
         internal static byte[] GetPseudorandomBytes(int count)
         {
-            Random random = new Random();
+            Random random = new();
             byte[] result = new byte[count];
             random.NextBytes(result);
             return result;

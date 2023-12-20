@@ -92,6 +92,7 @@ namespace TrulyRandom.Modules
             {
                 return;
             }
+
             lock (directoryLock)
             {
                 try

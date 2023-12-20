@@ -6,7 +6,7 @@ using TrulyRandom.Models;
 namespace TrulyRandom
 {
     /// <summary>
-    /// Provides method for end-user to retrieve random data of varios types 
+    /// Provides method for end-user to retrieve random data of various types 
     /// </summary>
     public class DataSource
     {

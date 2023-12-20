@@ -1389,7 +1389,7 @@
             // generate
             // 
             this.generate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.generate.Location = new System.Drawing.Point(14, 241);
+            this.generate.Location = new System.Drawing.Point(13, 250);
             this.generate.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.generate.Name = "generate";
             this.generate.Size = new System.Drawing.Size(141, 38);

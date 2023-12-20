@@ -53,7 +53,7 @@ namespace TrulyRandom.Models
 
         DataSource dataSource = null;
         /// <summary>
-        /// A <see cref="TrulyRandom.DataSource"/>  object assigned to this module. It provides method for end-user to retrieve random data of varios types 
+        /// A <see cref="TrulyRandom.DataSource"/>  object assigned to this module. It provides method for end-user to retrieve random data of various types 
         /// </summary>
         public DataSource DataSource
         {

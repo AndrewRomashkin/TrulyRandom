@@ -78,8 +78,7 @@ namespace TrulyRandom.DirectShow
         /// <returns>Return's <b>HRESULT</b> error code.</returns>
         /// 
         [PreserveSig]
-        int get_FilterCollection(
-            [Out, MarshalAs(UnmanagedType.IDispatch)] out object collection);
+        int get_FilterCollection([Out, MarshalAs(UnmanagedType.IDispatch)] out object collection);
 
         /// <summary>
         /// Retrieves a collection of all the filters listed in the registry.

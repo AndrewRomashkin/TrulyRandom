@@ -27,39 +27,39 @@ namespace UnitTests
         {
             TrulyRandom.Modules.Buffer buffer = new();
             buffer.BufferFileSize = 100;
-            buffer.MinBytesInBuffer = 200;
+            buffer.MinBytesInBuffer = 100;
             buffer.MaxFilesToStore = 10;
             buffer.ClearDiskData();
             buffer.Start();
 
-            Assert.IsTrue(buffer.BytesInBuffer == 0);
-            Assert.IsTrue(buffer.GetNumberOfDataFilesAvailable() == 0);
+            Assert.AreEqual(0,buffer.BytesInBuffer);
+            Assert.AreEqual(0,buffer.GetNumberOfDataFilesAvailable());
 
             Utils.InvokePrivate(buffer, "AddData", Enumerable.Repeat((byte)0xFF, 300).ToArray());
             Utils.AssignPrivate(buffer, "nextWriteCheck", DateTime.MinValue);
-            Thread.Sleep(100);
+            Utils.InvokePrivate(buffer, "SaveToDisk");
 
-            Assert.IsTrue(buffer.BytesInBuffer == 200);
-            Assert.IsTrue(buffer.GetNumberOfDataFilesAvailable() == 1);
+            Assert.AreEqual(300, buffer.BytesInBuffer);
+            Assert.AreEqual(0, buffer.GetNumberOfDataFilesAvailable());
 
             buffer.ClearDiskData();
-            Assert.IsTrue(buffer.GetNumberOfDataFilesAvailable() == 0);
+            Assert.AreEqual(0, buffer.GetNumberOfDataFilesAvailable());
 
-            Utils.InvokePrivate(buffer, "AddData", Enumerable.Repeat((byte)0xFF, 300).ToArray());
+            buffer.MaxBytesInBuffer = 200;
             Utils.AssignPrivate(buffer, "nextWriteCheck", DateTime.MinValue);
-            Thread.Sleep(100);
+            Utils.InvokePrivate(buffer, "SaveToDisk");
 
-            Assert.IsTrue(buffer.GetNumberOfDataFilesAvailable() == 3);
+            Assert.AreEqual(2, buffer.GetNumberOfDataFilesAvailable());
 
             buffer.ClearBuffer();
             Utils.AssignPrivate(buffer, "nextReadCheck", DateTime.MinValue);
-            Thread.Sleep(100);
+            Utils.InvokePrivate(buffer, "LoadFromDisk");
 
-            Assert.IsTrue(buffer.GetNumberOfDataFilesAvailable() == 1);
-            Assert.IsTrue(buffer.BytesInBuffer == 200);
+            Assert.AreEqual(1, buffer.GetNumberOfDataFilesAvailable());
+            Assert.AreEqual(100, buffer.BytesInBuffer);
 
             buffer.ClearDiskData();
-            Assert.IsTrue(buffer.GetNumberOfDataFilesAvailable() == 0);
+            Assert.AreEqual(0, buffer.GetNumberOfDataFilesAvailable());
             buffer.Dispose();
         }
 
@@ -467,11 +467,13 @@ namespace UnitTests
         {
             TrulyRandom.Modules.Buffer buffer1;
             buffer1 = new TrulyRandom.Modules.Buffer();
+            buffer1.CalculateEntropy = true;
             buffer1.Start();
             Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 10_000).ToArray());
 
             TrulyRandom.Modules.Buffer buffer2;
             buffer2 = new TrulyRandom.Modules.Buffer();
+            buffer2.CalculateEntropy = true;
             buffer2.Start();
             Utils.InvokePrivate(buffer2, "AddData", Enumerable.Range(0, 256).Select(x => (byte)(x % 256)).ToArray());
 
