@@ -146,7 +146,7 @@ namespace UnitTests
 
             Assert.IsTrue(extractor.NoDataToProcess);
             Assert.IsTrue(extractor.Entropy > 0.9);
-            Assert.IsTrue(extractor.BytesInBuffer == 64 * 1000);
+            Assert.AreEqual(64 * 1000, extractor.BytesInBuffer);
         }
 
         [TestMethod]
@@ -172,7 +172,7 @@ namespace UnitTests
 
             Assert.IsTrue(extractor.NoDataToProcess);
             Assert.IsTrue(extractor.Entropy < 0.9);
-            Assert.IsTrue(extractor.BytesInBuffer == 64 * 12500);
+            Assert.AreEqual(64 * 12500, extractor.BytesInBuffer);
         }
 
         [TestMethod]
@@ -245,7 +245,7 @@ namespace UnitTests
             extractor.Dispose();
 
             Assert.IsTrue(extractor.NoDataToProcess);
-            Assert.IsTrue(extractor.BytesInBuffer == 0);
+            Assert.AreEqual(0, extractor.BytesInBuffer);
         }
 
         [TestMethod]

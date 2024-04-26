@@ -89,17 +89,17 @@ namespace UnitTests
 
             byte[] data = buffer4.ReadAll();
             (int Zeros, int Ones, int Twos) = GetLongestRuns(data);
-            Assert.IsTrue(buffer1.BytesInBuffer == 0);
-            Assert.IsTrue(buffer2.BytesInBuffer == 0);
-            Assert.IsTrue(buffer3.BytesInBuffer == 0);
-            Assert.IsTrue(buffer4.BytesInBuffer == 0);
-            Assert.IsTrue(data.Length == 162);
-            Assert.IsTrue(Zeros == 2);
-            Assert.IsTrue(Ones == 1);
-            Assert.IsTrue(Twos == 1);
-            Assert.IsTrue(data.Where(x => x == 0).Count() == 100);
-            Assert.IsTrue(data.Where(x => x == 1).Count() == 57);
-            Assert.IsTrue(data.Where(x => x == 2).Count() == 5);
+            Assert.AreEqual(0,buffer1.BytesInBuffer);
+            Assert.AreEqual(0,buffer2.BytesInBuffer);
+            Assert.AreEqual(0,buffer3.BytesInBuffer);
+            Assert.AreEqual(0,buffer4.BytesInBuffer);
+            Assert.AreEqual(162, data.Length);
+            Assert.AreEqual(2, Zeros);
+            Assert.AreEqual(1, Ones);
+            Assert.AreEqual(1, Twos);
+            Assert.AreEqual(100, data.Where(x => x == 0).Count());
+            Assert.AreEqual(57, data.Where(x => x == 1).Count());
+            Assert.AreEqual(5, data.Where(x => x == 2).Count());
 
             buffer1.Dispose();
             buffer2.Dispose();
@@ -134,17 +134,17 @@ namespace UnitTests
 
             byte[] data = buffer4.ReadAll();
             (int Zeros, int Ones, int Twos) = GetLongestRuns(data);
-            Assert.IsTrue(buffer1.BytesInBuffer == 0);
-            Assert.IsTrue(buffer2.BytesInBuffer == 0);
-            Assert.IsTrue(buffer3.BytesInBuffer == 0);
-            Assert.IsTrue(buffer4.BytesInBuffer == 0);
-            Assert.IsTrue(data.Length == 162);
-            Assert.IsTrue(Zeros == 100);
-            Assert.IsTrue(Ones == 57);
-            Assert.IsTrue(Twos == 5);
-            Assert.IsTrue(data.Where(x => x == 0).Count() == 100);
-            Assert.IsTrue(data.Where(x => x == 1).Count() == 57);
-            Assert.IsTrue(data.Where(x => x == 2).Count() == 5);
+            Assert.AreEqual(0, buffer1.BytesInBuffer);
+            Assert.AreEqual(0, buffer2.BytesInBuffer);
+            Assert.AreEqual(0, buffer3.BytesInBuffer);
+            Assert.AreEqual(0, buffer4.BytesInBuffer);
+            Assert.AreEqual(162, data.Length);
+            Assert.AreEqual(100, Zeros);
+            Assert.AreEqual(57, Ones);
+            Assert.AreEqual(5, Twos);
+            Assert.AreEqual(100, data.Where(x => x == 0).Count());
+            Assert.AreEqual(57, data.Where(x => x == 1).Count());
+            Assert.AreEqual(5, data.Where(x => x == 2).Count());
 
             buffer1.Dispose();
             buffer2.Dispose();
@@ -219,16 +219,16 @@ namespace UnitTests
 
             Thread.Sleep(100);
 
-            Assert.IsTrue(extractor.ActualCompression == 1);
-            Assert.IsTrue(extractor.BytesInBuffer == 0);
-            Assert.IsTrue(buffer2.BytesInBuffer == 640);
+            Assert.AreEqual(1,extractor.ActualCompression);
+            Assert.AreEqual(0,extractor.BytesInBuffer);
+            Assert.AreEqual(640, buffer2.BytesInBuffer);
 
             Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 640).ToArray());
 
             Thread.Sleep(100);
 
-            Assert.IsTrue(extractor.ActualCompression == 3); //dynamic coefficient = 0.64, that means compression multiplier by 3
-            Assert.IsTrue(buffer2.BytesInBuffer == 640 + 192); // 640 bytes is 3 blocks of 64*3 = 192 bytes. 192*3 compressed is 3 blocks of 64 bytes = 192 bytes.
+            Assert.AreEqual(3, extractor.ActualCompression);   //dynamic coefficient = 0.64, that means compression multiplier by 3
+            Assert.AreEqual(640+192,buffer2.BytesInBuffer);    //640 bytes is 3 blocks of 64*3 = 192 bytes. 192*3 compressed is 3 blocks of 64 bytes = 192 bytes.
 
             buffer1.Dispose();
             buffer2.Dispose();
@@ -307,9 +307,9 @@ namespace UnitTests
 
             Assert.IsTrue(tester.BytesInBuffer <= 125000);
             Assert.IsTrue(tester.BytesInBuffer > 124000);
-            Assert.IsTrue(tester.TestParameters.TestsToPerform == TrulyRandom.NistTests.TestsEnum.All);
+            Assert.AreEqual(TrulyRandom.NistTests.TestsEnum.All,tester.TestParameters.TestsToPerform);
             Assert.IsTrue(lastTestResult.Success);
-            Assert.IsTrue(lastTestResult.SuccessfulTestProportion == 1);
+            Assert.AreEqual(1, lastTestResult.SuccessfulTestProportion);
 
             tester.Dispose();
             buffer.Dispose();
@@ -336,8 +336,8 @@ namespace UnitTests
 
             TrulyRandom.NistTests.FullTestResult lastTestResult = tester.LastTestResult;
 
-            Assert.IsTrue(buffer.BytesInBuffer == 0);
-            Assert.IsTrue(tester.TestParameters.TestsToPerform == TrulyRandom.NistTests.TestsEnum.All);
+            Assert.AreEqual(0, buffer.BytesInBuffer);
+            Assert.AreEqual(TrulyRandom.NistTests.TestsEnum.All, tester.TestParameters.TestsToPerform);
             Assert.IsTrue(!lastTestResult.Success);
             Assert.IsTrue(lastTestResult.SuccessfulTestProportion < 1);
 
@@ -376,7 +376,7 @@ namespace UnitTests
             tester.Parameters.LongTermEvaluation.PassByDefault = false;
             TrulyRandom.NistTests.FullTestResult result = tester.Perform(data);
 
-            Assert.IsTrue(!result.Success);
+            Assert.IsFalse(result.Success);
 
             tester.ClearHistory();
             tester.Parameters.AllowedFailedTestProportion = 0;
@@ -384,7 +384,7 @@ namespace UnitTests
             tester.Parameters.LongTermEvaluation.PassByDefault = true;
             result = tester.Perform(data);
 
-            Assert.IsTrue(!result.Success);
+            Assert.IsFalse(result.Success);
 
             tester.ClearHistory();
             tester.Parameters.AllowedFailedTestProportion = 0;
@@ -392,7 +392,7 @@ namespace UnitTests
             tester.Parameters.LongTermEvaluation.PassByDefault = false;
             result = tester.Perform(data);
 
-            Assert.IsTrue(!result.Success);
+            Assert.IsFalse(result.Success);
 
             tester.ClearHistory();
             tester.Parameters.AllowedFailedTestProportion = 0.1;
@@ -409,7 +409,7 @@ namespace UnitTests
             result = tester.Perform(data);
             Assert.IsTrue(result.Success);
             result = tester.Perform(data);
-            Assert.IsTrue(!result.Success);
+            Assert.IsFalse(result.Success);
         }
 
         [TestMethod]
@@ -435,9 +435,9 @@ namespace UnitTests
 
             byte[] data = extractor.ReadAll();
             Assert.IsTrue(extractor.NoDataToProcess);
-            Assert.IsTrue(extractor.ActualCompression == 2);
+            Assert.AreEqual(2, extractor.ActualCompression);
             Assert.IsTrue(!data.Where(x => x != 0).Any());
-            Assert.IsTrue(data.Length == 5000);
+            Assert.AreEqual(5000, data.Length);
         }
 
         [TestMethod]
@@ -479,8 +479,8 @@ namespace UnitTests
 
             Thread.Sleep(1500);
 
-            Assert.IsTrue(buffer1.Entropy == 0);
-            Assert.IsTrue(buffer2.Entropy == 1);
+            Assert.AreEqual(0, buffer1.Entropy);
+            Assert.AreEqual(1, buffer2.Entropy);
         }
 
         [TestMethod]
@@ -493,7 +493,10 @@ namespace UnitTests
             buffer.Write(new byte[] { 4 });
             buffer.Write(5);
             byte[] arr = buffer.Read(3);
-            Assert.IsTrue(arr[0] == 3 && arr[1] == 4 && arr[2] == 5 && buffer.Count == 0);
+            Assert.AreEqual(3, arr[0]);
+            Assert.AreEqual(4, arr[1]);
+            Assert.AreEqual(5, arr[2]);
+            Assert.AreEqual(3, buffer.Count);
         }
     }
 }

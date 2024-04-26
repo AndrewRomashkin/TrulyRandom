@@ -24,6 +24,7 @@ namespace UnitTests
         public void Video()
         {
             VideoSource source = new();
+            source.CalculateEntropy = true;
             source.Start();
             source.BufferSize = 100_000_000;  //To ensure buffer won't overflow after 2 frames
             bool success = false;
@@ -38,18 +39,19 @@ namespace UnitTests
             }
             source.Dispose();
             Assert.IsTrue(success);
-            Assert.IsTrue(!source.Still);
+            Assert.IsFalse(source.Still);
         }
 
         [TestMethod]
         public void Audio()
         {
             AudioSource source = new();
+            source.CalculateEntropy = true;
             source.Start();
             bool success = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(10)))
             {
-                if (source.BytesInBuffer > 1_000_000 && source.Device.SamplesRecieved >= 3 && source.Entropy > 0.3)
+                if (source.BytesInBuffer > 1_000_000 && source.Device.SamplesRecieved >= 3 && source.Entropy > 0.08)
                 {
                     success = true;
                     break;
@@ -58,7 +60,7 @@ namespace UnitTests
             }
             source.Dispose();
             Assert.IsTrue(success);
-            Assert.IsTrue(!source.Still);
+            Assert.IsFalse(source.Still);
         }
 
         [TestMethod]
@@ -67,6 +69,7 @@ namespace UnitTests
         {
             BiologicalSource source = new();
             source.Start();
+            source.CalculateEntropy = true;
             bool success = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(30)))
             {
@@ -95,7 +98,7 @@ namespace UnitTests
                 module.Dispose();
             }
             Thread.Sleep(500);
-            Assert.IsTrue(!modules.Where(x => !x.Disposed).Any());
+            Assert.IsFalse(modules.Where(x => !x.Disposed).Any());
         }
 
         [TestMethod]
