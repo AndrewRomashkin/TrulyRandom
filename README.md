@@ -2,6 +2,7 @@
 A powerful .NET library for generating and testing high-quality truly random data using consumer hardware (generation is available only for Windows). Includes easy-to-use implementation of the [NIST SP 800-22](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-22r1a.pdf) test library. No external dependencies.
 
 ![Unit tests](https://github.com/RomashkinAndrew/TrulyRandom/actions/workflows/UnitTests.yml/badge.svg?branch=main)
+
 ![TrulyRandom](https://buildstats.info/nuget/TrulyRandom)
 
 [Nuget](https://www.nuget.org/packages/TrulyRandom/)
