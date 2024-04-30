@@ -5,11 +5,12 @@
     <TargetFramework>net6.0</TargetFramework>
     
     <UseWindowsForms>False</UseWindowsForms>
-    <Deterministic>false</Deterministic>
+    <Deterministic>False</Deterministic>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SignAssembly>False</SignAssembly>
     <DelaySign>False</DelaySign>
+    <EnableWindowsTargeting>True</EnableWindowsTargeting>
 
     <_versionNumber>0.7</_versionNumber>
     <Version>$(_versionNumber)</Version>
