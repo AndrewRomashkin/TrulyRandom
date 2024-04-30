@@ -12,7 +12,7 @@ namespace UnitTests
     [TestClass]
     public class CompleteGraphs
     {
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void Video()
         {
             VideoSource source = new();
@@ -56,7 +56,7 @@ namespace UnitTests
             Assert.IsTrue(tester.SuccessRate > 0.3);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void Audio()
         {
             AudioSource source = new();
@@ -100,7 +100,7 @@ namespace UnitTests
             Assert.IsTrue(tester.SuccessRate > 0.3);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void Biological()
         {
             BiologicalSource source = new();
@@ -150,7 +150,7 @@ namespace UnitTests
             Assert.IsTrue(tester.SuccessRate > 0.3);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void All()
         {
             AudioSource audioSource = new();

@@ -3,25 +3,34 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    
     <UseWindowsForms>False</UseWindowsForms>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>false</Deterministic>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <SignAssembly>False</SignAssembly>
+    <DelaySign>False</DelaySign>
 
+    <_versionNumber>0.7</_versionNumber>
+    <Version>$(_versionNumber)</Version>
+    <AssemblyVersion>$(_versionNumber).*</AssemblyVersion>
+    <FileVersion>$(_versionNumber).*</FileVersion>
+    
     <RootNamespace>TrulyRandom</RootNamespace>
     <AssemblyName>TrulyRandom</AssemblyName>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>Romashkin Andrew</Authors>
     <Company>$(Authors)</Company>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>A .NET library for generating and testing truly random data using consumer hardware. Includes easy-to-use implementation of the NIST SP 800-22 test library. No external dependencies.</Description>
     <PackageProjectUrl>https://github.com/RomashkinAndrew/TrulyRandom</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/RomashkinAndrew/TrulyRandom</RepositoryUrl>
     <PackageTags>random;randomness;random number testing;nist</PackageTags>
-    <AssemblyVersion>$(AssemblyVersion)</AssemblyVersion>
-    <FileVersion>$(AssemblyVersion)</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>0.7.1</Version>
     <PackageIcon>icon.png</PackageIcon>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <Deterministic>false</Deterministic>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
