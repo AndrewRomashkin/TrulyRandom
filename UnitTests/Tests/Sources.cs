@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using TrulyRandom.Models;
 using TrulyRandom.Modules.Sources;
+using TrulyRandom.Modules.Sources.Prng;
 
 namespace UnitTests
 {
@@ -27,19 +28,21 @@ namespace UnitTests
             source.CalculateEntropy = true;
             source.Start();
             source.BufferSize = 100_000_000;  //To ensure buffer won't overflow after 2 frames
-            bool success = false;
+            bool enoughBytes = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(100)))
             {
-                if (source.BytesInBuffer > 1_000_000 && source.Device.SamplesRecieved >= 3 && source.Entropy > 0.3)
+                if (source.BytesInBuffer > 1_000_000 && source.Device.SamplesRecieved >= 3)
                 {
-                    success = true;
+                    enoughBytes = true;
+                    source.ForceRefreshEntropy();
                     break;
                 }
                 Thread.Sleep(100);
             }
-            source.Dispose();
-            Assert.IsTrue(success);
+            Assert.IsTrue(enoughBytes);
+            Assert.IsTrue(source.Entropy > 0.3);
             Assert.IsFalse(source.Still);
+            source.Dispose();
         }
 
         [TestMethod, TestCategory("RequiresHardware")]
@@ -48,19 +51,21 @@ namespace UnitTests
             AudioSource source = new();
             source.CalculateEntropy = true;
             source.Start();
-            bool success = false;
+            bool enoughBytes = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(10)))
             {
-                if (source.BytesInBuffer > 1_000_000 && source.Device.SamplesRecieved >= 3 && source.Entropy > 0.08)
+                if (source.BytesInBuffer > 1_000_000 && source.Device.SamplesRecieved >= 3)
                 {
-                    success = true;
+                    enoughBytes = true;
+                    source.ForceRefreshEntropy();
                     break;
                 }
                 Thread.Sleep(100);
             }
-            source.Dispose();
-            Assert.IsTrue(success);
+            Assert.IsTrue(enoughBytes);
+            Assert.IsTrue(source.Entropy > 0.08);
             Assert.IsFalse(source.Still);
+            source.Dispose();
         }
 
         [TestMethod, TestCategory("RequiresHardware")]
@@ -70,18 +75,20 @@ namespace UnitTests
             BiologicalSource source = new();
             source.Start();
             source.CalculateEntropy = true;
-            bool success = false;
+            bool enoughBytes = false;
             while (!testStart.WasAgo(TimeSpan.FromSeconds(30)))
             {
-                if (source.BytesInBuffer > 1_000 && source.Entropy > 0.3)
+                if (source.BytesInBuffer > 1_000)
                 {
-                    success = true;
+                    enoughBytes = true;
+                    source.ForceRefreshEntropy();
                     break;
                 }
                 Thread.Sleep(100);
             }
+            Assert.IsTrue(enoughBytes);
+            Assert.IsTrue(source.Entropy > 0.3);
             source.Dispose();
-            Assert.IsTrue(success);
         }
 
         [TestMethod, TestCategory("RequiresHardware")]
@@ -126,5 +133,45 @@ namespace UnitTests
             source1.Dispose();
             Assert.IsTrue(success);
         }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        private void TestPrngSource(PrngSource source)
+        {
+            source.CalculateEntropy = true;
+            source.Start();
+            bool enoughBytes = false;
+            while (!testStart.WasAgo(TimeSpan.FromSeconds(10)))
+            {
+                if (source.BytesInBuffer > 1_000_000)
+                {
+                    enoughBytes = true;
+                    source.ForceRefreshEntropy();
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+            Assert.IsTrue(enoughBytes);
+            Assert.IsTrue(source.Entropy > 0.99);
+            source.Dispose();
+        }
+
+        [TestMethod]
+        public void LCG()
+        {
+            TestPrngSource(new LcgPrngSource());
+        }
+
+        [TestMethod]
+        public void Xorshift()
+        {
+            TestPrngSource(new XorshiftPrngSource());
+        }
+
+        [TestMethod]
+        public void Mt()
+        {
+            TestPrngSource(new MtPrngSource());
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -324,6 +325,15 @@ namespace TrulyRandom
                 System.Threading.Thread.Sleep(1);
                 lastBreak = DateTime.Now;
             }
+        }
+
+        /// <summary>
+        /// Gets random data from system random number generator. It can be used for 
+        /// </summary>
+        /// <param name="length">Required number of bytes</param>
+        internal static byte[] GetSystemRandom(int length)
+        {
+            return RandomNumberGenerator.GetBytes(length);
         }
     }
 }

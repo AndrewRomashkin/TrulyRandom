@@ -8,41 +8,41 @@ using TrulyRandom.Models;
 namespace TrulyRandom.Modules
 {
     /// <summary>
-    /// Allows for data storage both in the output buffer and on the disk
+    /// Allows for data storage both in the output buffer and on the disk.
     /// </summary>
     public class Buffer : Module
     {
         /// <summary>
-        /// Sources of data for this buffer
+        /// Sources of data for this buffer.
         /// </summary>
         public Module[] Sources { get; set; } = Array.Empty<Module>();
         /// <summary>
-        /// Size of each of the files stored on the disk
+        /// Size of each of the files stored on the disk.
         /// </summary>
         public int BufferFileSize { get; set; } = 1_000_000;
         /// <summary>
-        /// Maximum number of files to store on the disk (0 to disable disk storage)
+        /// Maximum number of files to store on the disk (0 to disable disk storage).
         /// </summary>
         public int MaxFilesToStore { get; set; } = 0;
         /// <summary>
-        /// If number of bytes in the buffer is lower than this amount - data will be loaded from the disk
+        /// If number of bytes in the buffer is lower than this amount - data will be loaded from the disk.
         /// </summary>
         public int MinBytesInBuffer { get; set; } = 100_000;
         /// <summary>
-        /// If number of bytes in the buffer is higher than this amount - data will be saved to the disk
+        /// If number of bytes in the buffer is higher than this amount - data will be saved to the disk.
         /// </summary>
         public int MaxBytesInBuffer { get; set; } = 2_000_000;
         /// <summary>
-        /// Directory in which buffer files will be located
+        /// Directory in which buffer files will be located.
         /// </summary>
         public string BufferDirectory { get; set; } = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "RandomnessBuffer";
         /// <summary>
-        /// Determines whether data block should be taken from all available sources and concatenated (<c>true</c>), or from one source if possible (<c>false</c>)
+        /// Determines whether data block should be taken from all available sources and concatenated (<c>true</c>), or from one source if possible (<c>false</c>).
         /// </summary>
         public bool MixDataFromDifferentSources { get; set; } = true;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Buffer" /> class
+        /// Initializes a new instance of the <see cref="Buffer" /> class.
         /// </summary>
         public Buffer()
         {
@@ -74,7 +74,7 @@ namespace TrulyRandom.Modules
                     }
                 }
 
-                SaveToDisk();
+                SaveToDisk(false);
                 LoadFromDisk();
                 Thread.Sleep(1);
             }
@@ -84,21 +84,21 @@ namespace TrulyRandom.Modules
         readonly object directoryLock = new();
         DateTime nextWriteCheck = DateTime.Now;
         /// <summary>
-        /// Saves exccess data to the disk
+        /// Saves exccess data to the disk.
         /// </summary>
-        void SaveToDisk()
+        private void SaveToDisk(bool force)
         {
-            if (DateTime.Now < nextWriteCheck || BytesInBuffer < MaxBytesInBuffer)
-            {
-                return;
-            }
-
             lock (directoryLock)
             {
+                if (!force && (DateTime.Now < nextWriteCheck || BytesInBuffer < MaxBytesInBuffer))
+                {
+                    return;
+                }
+
                 try
                 {
                     Directory.CreateDirectory(BufferDirectory);
-                    while (BytesInBuffer >= MinBytesInBuffer + BufferFileSize)
+                    while (BytesInBuffer >= MinBytesInBuffer + BufferFileSize || force && BytesInBuffer > 0)
                     {
                         List<int> files = new();
                         foreach (string file in Directory.GetFiles(BufferDirectory))
@@ -108,7 +108,7 @@ namespace TrulyRandom.Modules
                                 files.Add(number);
                             }
                         }
-                        if (files.Count < MaxFilesToStore)
+                        if (files.Count < MaxFilesToStore || force)
                         {
                             int fileName = 0;
                             while (files.Contains(fileName))
@@ -116,7 +116,7 @@ namespace TrulyRandom.Modules
                                 fileName++;
                             }
 
-                            byte[] data = ReadExactly(BufferFileSize);
+                            byte[] data = ReadUpTo(BufferFileSize);
                             if (data != null && data.Any())
                             {
                                 try
@@ -145,18 +145,26 @@ namespace TrulyRandom.Modules
             }
         }
 
+        /// <summary>
+        /// Stops the buffer and saves all buffer contents to disk, even if it surpasses the <see cref="MaxFilesToStore" /> constraint.
+        /// </summary>
+        public void SaveAllToDiskAndStop()
+        {
+            SaveToDisk(true);
+        }
+
         DateTime nextReadCheck = DateTime.MinValue;
         /// <summary>
-        /// Loads insufficient data from buffer files
+        /// Loads insufficient data from buffer files.
         /// </summary>
         void LoadFromDisk()
         {
-            if (DateTime.Now < nextReadCheck || BytesInBuffer >= MinBytesInBuffer)
-            {
-                return;
-            }
             lock (directoryLock)
             {
+                if (DateTime.Now < nextReadCheck || BytesInBuffer >= MinBytesInBuffer)
+                {
+                    return;
+                }
                 if (!Directory.Exists(BufferDirectory))
                 {
                     nextReadCheck = DateTime.Now + TimeSpan.FromSeconds(10);
@@ -194,7 +202,7 @@ namespace TrulyRandom.Modules
         }
 
         /// <summary>
-        /// Deletes data stored on the disk
+        /// Deletes data stored on the disk.
         /// </summary>
         public void ClearDiskData()
         {
@@ -216,7 +224,7 @@ namespace TrulyRandom.Modules
         }
 
         /// <summary>
-        /// Gets the number of buffer files available on the disk
+        /// Gets the number of buffer files available on the disk.
         /// </summary>
         /// <returns>Number of files available</returns>
         public int GetNumberOfDataFilesAvailable()
@@ -240,7 +248,7 @@ namespace TrulyRandom.Modules
         }
 
         /// <summary>
-        /// Reads data from sources
+        /// Reads data from sources.
         /// </summary>
         /// <returns>Data read</returns>
         byte[] ReadDataFromSources()
@@ -293,6 +301,7 @@ namespace TrulyRandom.Modules
                     }
                     else
                     {
+                        lockedSources = lockedSources.OrderByDescending(x => x.Priority).ToList();
                         for (int i = 0; i < lockedSources.Count; i++)
                         {
                             data[i] = lockedSources[i].ReadUpTo(bytesToRead - data.Where(x => x != null).Sum(x => x.Length));
@@ -326,7 +335,7 @@ namespace TrulyRandom.Modules
         }
 
         /// <summary>
-        /// Adds source to read data from
+        /// Adds source to read data from.
         /// </summary>
         /// <param name="source"></param>
         public void AddSource(Module source)
@@ -339,7 +348,7 @@ namespace TrulyRandom.Modules
         }
 
         /// <summary>
-        /// Removes source from the list
+        /// Removes source from the list.
         /// </summary>
         /// <param name="source">Source to be removed</param>
         public void RemoveSource(Module source)

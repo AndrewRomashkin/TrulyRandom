@@ -13,25 +13,25 @@ namespace TrulyRandom.Models
         readonly CircularBuffer<byte> buffer = new(10 * 1024 * 1024);
 
         /// <summary>
-        /// Main thread
+        /// Main thread.
         /// </summary>
         protected Thread thread;
         /// <summary>
-        /// Determines whether source should be paused when buffer is full
+        /// Determines whether source should be paused when buffer is full.
         /// </summary>
         protected bool pauseOnOverflow = true;
         /// <summary>
-        /// If source was paused due to overflow and amount of data in the buffer is lower then this threshold - it will be unpaused
+        /// If source was paused due to overflow and amount of data in the buffer is lower then this threshold - it will be unpaused.
         /// </summary>
         protected double overflowHysteresis = 0.5;
         /// <summary>
-        /// Shows whether module buffer is full
+        /// Shows whether module buffer is full.
         /// </summary>
         public bool Overflow => buffer.Count >= BufferSize;
 
         string name = "";
         /// <summary>
-        /// Module name
+        /// Module name.
         /// </summary>
         public string Name
         {
@@ -51,9 +51,14 @@ namespace TrulyRandom.Models
             }
         }
 
+        /// <summary>
+        /// Modules with high priority will be used first by downstream modules in the graph.
+        /// </summary>
+        public int Priority { get; set; } = 0;
+
         DataSource dataSource = null;
         /// <summary>
-        /// A <see cref="TrulyRandom.DataSource"/>  object assigned to this module. It provides method for end-user to retrieve random data of various types 
+        /// A <see cref="TrulyRandom.DataSource"/>  object assigned to this module. It provides method for end-user to retrieve random data of various types.
         /// </summary>
         public DataSource DataSource
         {
@@ -68,12 +73,12 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Object for locking access to read methods
+        /// Object for locking access to read methods.
         /// </summary>
         public object Sync { get; } = new object();
 
         /// <summary>
-        /// Maximum size of the output buffer
+        /// Maximum size of the output buffer.
         /// </summary>
         public int BufferSize
         {
@@ -82,32 +87,32 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Amount of bytes currently in the output buffer
+        /// Amount of bytes currently in the output buffer.
         /// </summary>
         public int BytesInBuffer => buffer.Count;
 
         /// <summary>
-        /// Proportion of the output buffer currently occupied
+        /// Proportion of the output buffer currently occupied.
         /// </summary>
         public double BufferState => (double)BytesInBuffer / BufferSize;
 
         /// <summary>
-        /// Total amount of bytes written to the output buffer
+        /// Total amount of bytes written to the output buffer.
         /// </summary>
         public ulong TotalBytesGenerated { get; private set; } = 0;
 
         /// <summary>
-        /// Current generation or processing rate in bytes per second, calculated only during periods of activity
+        /// Current generation or processing rate in bytes per second, calculated only during periods of activity.
         /// </summary>
         public int BytesPerSecond { get; protected set; } = 0;
 
         /// <summary>
-        /// Current generation or processing rate in bytes per second, calculated during both periods of activity and inactivity
+        /// Current generation or processing rate in bytes per second, calculated during both periods of activity and inactivity.
         /// </summary>
         public int BytesPerSecondInclPause { get; private set; } = 0;
 
         /// <summary>
-        /// Determines whether this module is started
+        /// Determines whether this module is started.
         /// </summary>
         public bool Started
         {
@@ -117,7 +122,7 @@ namespace TrulyRandom.Models
 
         bool calculateEntropy = false;
         /// <summary>
-        /// Determines whether entropy of the last data generated should be calculated
+        /// Determines whether entropy of the last data generated should be calculated.
         /// </summary>
         public bool CalculateEntropy
         {
@@ -144,7 +149,7 @@ namespace TrulyRandom.Models
 
         bool calculateBPS = true;
         /// <summary>
-        /// Determines whether BPS (bytes per second) should be calculated
+        /// Determines whether BPS (bytes per second) should be calculated.
         /// </summary>
         public bool CalculateBPS
         {
@@ -170,13 +175,13 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Entropy of the last data generated
+        /// Entropy of the last data generated.
         /// </summary>
         public double Entropy { get; private set; } = 0;
 
         readonly System.Timers.Timer timer = new(100);
         /// <summary>
-        /// Initializes a new instance of the <see cref="Module" /> class
+        /// Initializes a new instance of the <see cref="Module" /> class.
         /// </summary>
         public Module()
         {
@@ -187,7 +192,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Represents time interval
+        /// Represents time interval.
         /// </summary>
         class Interval
         {
@@ -222,7 +227,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Calculates the entropy of the last data generated
+        /// Calculates the entropy of the last data generated.
         /// </summary>
         void EntropyCalculation()
         {
@@ -250,7 +255,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Forces immediate entropy calculation
+        /// Forces immediate entropy calculation.
         /// </summary>
         public void ForceRefreshEntropy()
         {
@@ -276,7 +281,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Defines the default method to calculate BPS
+        /// Defines the default method to calculate BPS.
         /// </summary>
         protected virtual void BPSCalculation()
         {
@@ -325,7 +330,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Provides the possibility to run some code periodically
+        /// Provides the possibility to run some code periodically.
         /// </summary>
         protected virtual void PeriodicalActivity()
         {
@@ -333,7 +338,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Reads exactly <c>count</c> bytes from the output buffer. If there is insufficient data in the buffer, empty array will be returned
+        /// Reads exactly <c>count</c> bytes from the output buffer. If there is insufficient data in the buffer, empty array will be returned.
         /// </summary>
         /// <param name="count">Number of bytes to be read</param>
         /// <returns>Data from the output buffer</returns>
@@ -360,7 +365,7 @@ namespace TrulyRandom.Models
 
 
         /// <summary>
-        /// Reads all data from the output buffer, but no less than <c>count</c> bytes. Otherwise, empty array will be returned
+        /// Reads all data from the output buffer, but no less than <c>count</c> bytes. Otherwise, empty array will be returned.
         /// </summary>
         /// <param name="count">Number of bytes to be read</param>
         /// <returns>Data from the output buffer</returns>
@@ -388,7 +393,7 @@ namespace TrulyRandom.Models
 
 
         /// <summary>
-        /// Reads all data from the output buffer, but no more than <c>count</c> bytes
+        /// Reads all data from the output buffer, but no more than <c>count</c> bytes.
         /// </summary>
         /// <param name="count">Number of bytes to be read</param>
         /// <returns>Data from the output buffer</returns>
@@ -422,7 +427,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Reads all data from the output buffer
+        /// Reads all data from the output buffer.
         /// </summary>
         /// <returns>Data from the output buffer</returns>
         public byte[] ReadAll()
@@ -444,7 +449,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Clears the output buffer and discard the data
+        /// Clears the output buffer and discard the data.
         /// </summary>
         public void ClearBuffer()
         {
@@ -459,10 +464,10 @@ namespace TrulyRandom.Models
         DateTime lastDataAdded = DateTime.MinValue;
 
         /// <summary>
-        /// Adds data to the output buffer. In case of an overflow oldest data will be discarded
+        /// Adds data to the output buffer. In case of an overflow oldest data will be discarded.
         /// </summary>
         /// <param name="data">Data to be added</param>
-        protected void AddData(byte[] data)
+        public void AddData(byte[] data)
         {
             if (data == null || data.Length == 0)
             {
@@ -494,7 +499,7 @@ namespace TrulyRandom.Models
         bool manualRun = false;
         bool overflowPause = false;
         /// <summary>
-        /// Determines whether module is allowed to run by user
+        /// Determines whether module is allowed to run by user.
         /// </summary>
         bool ManualRun
         {
@@ -518,7 +523,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Determines whether module is paused due to an overflow
+        /// Determines whether module is paused due to an overflow.
         /// </summary>
         bool OverflowPause
         {
@@ -542,21 +547,21 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Shows whether module should run
+        /// Shows whether module should run.
         /// </summary>
         protected bool Run => !OverflowPause && ManualRun;
 
         /// <summary>
-        /// Determines whether module should be disposed
+        /// Determines whether module should be disposed.
         /// </summary>
         protected bool dispose = false;
         /// <summary>
-        /// Determines whether module is disposed
+        /// Determines whether module is disposed.
         /// </summary>
         public virtual bool Disposed { get; protected set; }
 
         /// <summary>
-        /// Starts the module
+        /// Starts the module.
         /// </summary>
         public void Start()
         {
@@ -564,7 +569,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Module start sequence
+        /// Module start sequence.
         /// </summary>
         protected virtual void StartInternal()
         {
@@ -581,7 +586,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Stops the module
+        /// Stops the module.
         /// </summary>
         public void Stop()
         {
@@ -589,7 +594,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Module stop sequence
+        /// Module stop sequence.
         /// </summary>
         protected virtual void StopInternal()
         {
@@ -604,7 +609,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Releases all resources used by this object
+        /// Releases all resources used by this object.
         /// </summary>
         public virtual void Dispose()
         {
@@ -615,7 +620,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Pauses the module in case of overflow and unpauses otherwise
+        /// Pauses the module in case of overflow and unpauses otherwise.
         /// </summary>
         void CheckForOverflow()
         {
@@ -631,7 +636,7 @@ namespace TrulyRandom.Models
         }
 
         /// <summary>
-        /// Finalizes the object
+        /// Finalizes the object.
         /// </summary>
         ~Module()
         {

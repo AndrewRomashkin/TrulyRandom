@@ -7,7 +7,7 @@ using TrulyRandom;
 namespace UnitTests
 {
     /// <summary>
-    /// Evaluates the uniformity of the result data distribution
+    /// Evaluates the uniformity of the result data distribution.
     /// </summary>
     [TestClass]
     public class DataSource
@@ -21,7 +21,7 @@ namespace UnitTests
             buffer.Start();
             dataSource = buffer.DataSource;
             buffer.BufferSize = 100_000_000;
-            Utils.InvokePrivate(buffer, "AddData", Utils.GetPseudorandomBytes(100_000_000));
+            buffer.AddData(Utils.GetPseudorandomBytes(100_000_000));
         }
 
         [TestCleanup()]

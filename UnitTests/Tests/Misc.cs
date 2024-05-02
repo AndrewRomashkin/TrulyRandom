@@ -35,9 +35,9 @@ namespace UnitTests
             Assert.AreEqual(0,buffer.BytesInBuffer);
             Assert.AreEqual(0,buffer.GetNumberOfDataFilesAvailable());
 
-            Utils.InvokePrivate(buffer, "AddData", Enumerable.Repeat((byte)0xFF, 300).ToArray());
+            buffer.AddData(Enumerable.Repeat((byte)0xFF, 300).ToArray());
             Utils.AssignPrivate(buffer, "nextWriteCheck", DateTime.MinValue);
-            Utils.InvokePrivate(buffer, "SaveToDisk");
+            Utils.InvokePrivate(buffer, "SaveToDisk", false);
 
             Assert.AreEqual(300, buffer.BytesInBuffer);
             Assert.AreEqual(0, buffer.GetNumberOfDataFilesAvailable());
@@ -47,7 +47,7 @@ namespace UnitTests
 
             buffer.MaxBytesInBuffer = 200;
             Utils.AssignPrivate(buffer, "nextWriteCheck", DateTime.MinValue);
-            Utils.InvokePrivate(buffer, "SaveToDisk");
+            Utils.InvokePrivate(buffer, "SaveToDisk", false);
 
             Assert.AreEqual(2, buffer.GetNumberOfDataFilesAvailable());
 
@@ -67,13 +67,13 @@ namespace UnitTests
         public void MultipleSourceMixing()
         {
             TrulyRandom.Modules.Buffer buffer1 = new();
-            Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 100).ToArray());
+            buffer1.AddData(Enumerable.Repeat((byte)0, 100).ToArray());
             buffer1.Start();
             TrulyRandom.Modules.Buffer buffer2 = new();
-            Utils.InvokePrivate(buffer2, "AddData", Enumerable.Repeat((byte)1, 57).ToArray());
+            buffer2.AddData(Enumerable.Repeat((byte)1, 57).ToArray());
             buffer2.Start();
             TrulyRandom.Modules.Buffer buffer3 = new();
-            Utils.InvokePrivate(buffer3, "AddData", Enumerable.Repeat((byte)2, 5).ToArray());
+            buffer3.AddData(Enumerable.Repeat((byte)2, 5).ToArray());
             buffer3.Start();
             TrulyRandom.Modules.Buffer buffer4 = new();
             buffer4.AddSource(buffer1);
@@ -111,13 +111,13 @@ namespace UnitTests
         public void MultipleSourceNoMixing()
         {
             TrulyRandom.Modules.Buffer buffer1 = new();
-            Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 100).ToArray());
+            buffer1.AddData(Enumerable.Repeat((byte)0, 100).ToArray());
             buffer1.Start();
             TrulyRandom.Modules.Buffer buffer2 = new();
-            Utils.InvokePrivate(buffer2, "AddData", Enumerable.Repeat((byte)1, 57).ToArray());
+            buffer2.AddData(Enumerable.Repeat((byte)1, 57).ToArray());
             buffer2.Start();
             TrulyRandom.Modules.Buffer buffer3 = new();
-            Utils.InvokePrivate(buffer3, "AddData", Enumerable.Repeat((byte)2, 5).ToArray());
+            buffer3.AddData(Enumerable.Repeat((byte)2, 5).ToArray());
             buffer3.Start();
             TrulyRandom.Modules.Buffer buffer4 = new();
             buffer4.AddSource(buffer1);
@@ -214,7 +214,7 @@ namespace UnitTests
             buffer2.Start();
             extractor.DynamicCoefficientSource = buffer2;
 
-            Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 640).ToArray());
+            buffer1.AddData(Enumerable.Repeat((byte)0, 640).ToArray());
             extractor.Start();
 
             Thread.Sleep(100);
@@ -223,7 +223,7 @@ namespace UnitTests
             Assert.AreEqual(0,extractor.BytesInBuffer);
             Assert.AreEqual(640, buffer2.BytesInBuffer);
 
-            Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 640).ToArray());
+            buffer1.AddData(Enumerable.Repeat((byte)0, 640).ToArray());
 
             Thread.Sleep(100);
 
@@ -240,7 +240,7 @@ namespace UnitTests
         {
             TrulyRandom.Modules.Buffer seedSource = new();
             seedSource.Start();
-            Utils.InvokePrivate(seedSource, "AddData", Utils.First1mDigitsOfE.ToByteArray());
+            seedSource.AddData(Utils.First1mDigitsOfE.ToByteArray());
 
             TrulyRandom.Modules.Buffer buffer = new();
             buffer.Start();
@@ -254,22 +254,24 @@ namespace UnitTests
 
             byte[][] result = new byte[6][];
 
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE[..800].ToByteArray());
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE[..800].ToByteArray());
+            extractor.SetSeed(new byte[] { 100 });
+            buffer.AddData(Utils.First1mDigitsOfE[..800].ToByteArray());
+            buffer.AddData(Utils.First1mDigitsOfE[..800].ToByteArray());
             Thread.Sleep(100);
             result[0] = extractor.ReadExactly(extractor.BytesInBuffer / 2);
             result[1] = extractor.ReadAll();
 
             extractor.SeedSource = seedSource;
+            extractor.ForceRotateSeed();
 
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE[..800].ToByteArray());
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE[..800].ToByteArray());
+            buffer.AddData(Utils.First1mDigitsOfE[..800].ToByteArray());
+            buffer.AddData(Utils.First1mDigitsOfE[..800].ToByteArray());
             Thread.Sleep(100);
             result[2] = extractor.ReadExactly(extractor.BytesInBuffer / 2);
             result[3] = extractor.ReadAll();
 
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE[..800].ToByteArray());
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE[..800].ToByteArray());
+            buffer.AddData(Utils.First1mDigitsOfE[..800].ToByteArray());
+            buffer.AddData(Utils.First1mDigitsOfE[..800].ToByteArray());
             Thread.Sleep(100);
             result[4] = extractor.ReadExactly(extractor.BytesInBuffer / 2);
             result[5] = extractor.ReadAll();
@@ -296,7 +298,7 @@ namespace UnitTests
             tester.AddSource(buffer);
             tester.Start();
 
-            Utils.InvokePrivate(buffer, "AddData", Utils.First1mDigitsOfE.ToByteArray());
+            buffer.AddData(Utils.First1mDigitsOfE.ToByteArray());
 
             while (tester.TotalBytesConsumed == 0 && !testStart.WasAgo(TimeSpan.FromSeconds(300)))
             {
@@ -327,7 +329,7 @@ namespace UnitTests
             tester.BatchSize = 12_500;
             tester.Start();
 
-            Utils.InvokePrivate(buffer, "AddData", Enumerable.Range(0, 12_500).Select(x => (byte)(x % 256)).ToArray());
+            buffer.AddData(Enumerable.Range(0, 12_500).Select(x => (byte)(x % 256)).ToArray());
 
             while (tester.TotalBytesConsumed == 0 && !testStart.WasAgo(TimeSpan.FromSeconds(300)))
             {
@@ -418,7 +420,7 @@ namespace UnitTests
             TrulyRandom.Modules.Buffer buffer;
             buffer = new TrulyRandom.Modules.Buffer();
             buffer.Start();
-            Utils.InvokePrivate(buffer, "AddData", Enumerable.Repeat((byte)0xAA, 10_000).ToArray());
+            buffer.AddData(Enumerable.Repeat((byte)0xAA, 10_000).ToArray());
 
             VonNeumannExtractor extractor = new();
             extractor.AddSource(buffer);
@@ -446,7 +448,7 @@ namespace UnitTests
             TrulyRandom.Modules.Buffer buffer;
             buffer = new TrulyRandom.Modules.Buffer();
             buffer.Start();
-            Utils.InvokePrivate(buffer, "AddData", Enumerable.Repeat((byte)0xAA, 10_000).ToArray());
+            buffer.AddData(Enumerable.Repeat((byte)0xAA, 10_000).ToArray());
 
             VonNeumannExtractor extractor = new();
             extractor.AddSource(buffer);
@@ -469,13 +471,13 @@ namespace UnitTests
             buffer1 = new TrulyRandom.Modules.Buffer();
             buffer1.CalculateEntropy = true;
             buffer1.Start();
-            Utils.InvokePrivate(buffer1, "AddData", Enumerable.Repeat((byte)0, 10_000).ToArray());
+            buffer1.AddData(Enumerable.Repeat((byte)0, 10_000).ToArray());
 
             TrulyRandom.Modules.Buffer buffer2;
             buffer2 = new TrulyRandom.Modules.Buffer();
             buffer2.CalculateEntropy = true;
             buffer2.Start();
-            Utils.InvokePrivate(buffer2, "AddData", Enumerable.Range(0, 256).Select(x => (byte)(x % 256)).ToArray());
+            buffer2.AddData(Enumerable.Range(0, 256).Select(x => (byte)(x % 256)).ToArray());
 
             Thread.Sleep(1500);
 

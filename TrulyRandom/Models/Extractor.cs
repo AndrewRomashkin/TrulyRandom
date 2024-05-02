@@ -228,10 +228,11 @@ namespace TrulyRandom.Models
         /// Module which determines <see cref="DynamicCoefficient"/>
         /// </summary>
         public Module DynamicCoefficientSource { get; set; } = null;
+
         /// <summary>
         /// Current dynamic coefficient
         /// </summary>
-        protected double DynamicCoefficient
+        public double DynamicCoefficient
         {
             get
             {
@@ -241,6 +242,23 @@ namespace TrulyRandom.Models
                     return 0;
                 }
                 return dynamicCoefficientSource.BufferState;
+            }
+        }
+
+        int maxBatchSize = 5_000_000;
+        /// <summary>
+        /// Maximum length of the batch with respect to dynamic coefficient.
+        /// </summary>
+        public int MaxBatchSize
+        {
+            get => maxBatchSize;
+            set
+            {
+                if (value < 1)
+                {
+                    throw new ArgumentException("Max batch size should be >= 1");
+                }
+                maxBatchSize = value;
             }
         }
 

@@ -5,7 +5,6 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>True</UseWindowsForms>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <EnableWindowsTargeting>True</EnableWindowsTargeting>
     
     <RootNamespace>SampleApp</RootNamespace>
     <AssemblyName>SampleApp</AssemblyName>

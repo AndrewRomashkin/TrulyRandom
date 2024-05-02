@@ -10,7 +10,6 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SignAssembly>False</SignAssembly>
     <DelaySign>False</DelaySign>
-    <EnableWindowsTargeting>True</EnableWindowsTargeting>
 
     <_versionNumber>0.7</_versionNumber>
     <Version>$(_versionNumber)</Version>

@@ -5,7 +5,7 @@ using TrulyRandom.Models;
 namespace TrulyRandom.Modules.Extractors
 {
     /// <summary>
-    /// 
+    /// Treats start of the array as randomness source to randomly shuffle the remainder using Fisher–Yates algorithm. Data used as randomness source is be discarded.
     /// </summary>
     public class ShuffleExtractor : Extractor, ISeedable
     {
@@ -26,39 +26,16 @@ namespace TrulyRandom.Modules.Extractors
             }
         }
 
-        int maxBatchSize = 5_000_000;
-        /// <summary>
-        /// Maximum length of the batch with respect to dynamic coefficient
-        /// </summary>
-        public int MaxBatchSize
-        {
-            get => maxBatchSize;
-            set
-            {
-                if (value < 1)
-                {
-                    throw new ArgumentException("Max batch size should be >= 1");
-                }
-                maxBatchSize = value;
-            }
-        }
-
         /// <inheritdoc/>
         protected override bool UseDefaultCompressionCalculator => true;
 
         /// <inheritdoc/>
         protected override bool Seedable => true;
-        /// <summary>
-        /// Length of the seed
-        /// </summary>
+        /// <inheritdoc/>
         public int SeedLength { get => seedLength; set => seedLength = value; }
-        /// <summary>
-        /// Number of input bytes after which seed will be rotated
-        /// </summary>
+        /// <inheritdoc/>
         public int SeedRotationInterval { get => seedRotationInterval; set => seedRotationInterval = value; }
-        /// <summary>
-        /// Source of seed data. It is recommended to use high-quality entropy from the end of a chain
-        /// </summary>
+        /// <inheritdoc/>
         public Module SeedSource
         {
             get => seedSource;
@@ -73,8 +50,23 @@ namespace TrulyRandom.Modules.Extractors
             }
         }
 
+        /// <inheritdoc/>
+        public void SetSeed(byte[] data)
+        {
+            if (data.Length < 1)
+            {
+                throw new ArgumentException($"Seed should be at least 1 byte long");
+            }
+            seed = data;
+        }
+        /// <inheritdoc/>
+        public void ForceRotateSeed()
+        {
+            RotateSeed(true);
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShuffleExtractor" /> class
+        /// Initializes a new instance of the <see cref="ShuffleExtractor" /> class.
         /// </summary>
         public ShuffleExtractor()
         {
@@ -109,10 +101,18 @@ namespace TrulyRandom.Modules.Extractors
 
             int currentBitPointer = 0;
             int leftoverBytes;
+
+            byte[] backupSeed = null;
+            if (seed == null)
+            {
+                backupSeed = Utils.GetSystemRandom(SeedLength);
+            }
+
             //Treating start of the array as randomness source, trying to get enough random numbers to perform shuffle of the remainder
             do
             {
-                int? position = GenerateRandomNumberFromArrayElements(data, ref currentBitPointer, positions.Count + 1, seed);
+
+                int? position = GenerateRandomNumberFromArrayElements(data, ref currentBitPointer, positions.Count + 1, seed ?? backupSeed);
                 if (position != null)
                 {
                     positions.Add(position.Value);
@@ -191,10 +191,7 @@ namespace TrulyRandom.Modules.Extractors
             int bitIndex = currentBitPointer % 8;
 
             byte currentByte = array[byteIndex];
-            if (seed != null)
-            {
-                currentByte ^= seed[byteIndex % seed.Length];
-            }
+            currentByte ^= seed[byteIndex % seed.Length];
             currentBitPointer++;
             return currentByte.Bit(bitIndex);
         }

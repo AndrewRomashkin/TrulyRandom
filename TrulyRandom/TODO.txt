@@ -4,6 +4,4 @@
 4. Restrict testing for too short sequences;
 5. Test even with insufficient cycles;
 6. Temporarily disable testing;
-7. String generator;
-8. XOR extractor;
-9. Tests for XORSHIFT and LCG generators.
+7. String generator.

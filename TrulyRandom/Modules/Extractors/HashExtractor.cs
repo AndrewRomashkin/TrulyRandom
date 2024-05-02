@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using TrulyRandom.Models;
 
@@ -88,18 +89,26 @@ namespace TrulyRandom.Modules.Extractors
 
         /// <inheritdoc/>
         protected override bool Seedable => true;
-        /// <summary>
-        /// Length of the seed
-        /// </summary>
+        /// <inheritdoc/>
         public int SeedLength { get => seedLength; set => seedLength = value; }
-        /// <summary>
-        /// Number of input bytes after which seed will be rotated
-        /// </summary>
+        /// <inheritdoc/>
         public int SeedRotationInterval { get => seedRotationInterval; set => seedRotationInterval = value; }
-        /// <summary>
-        /// Source of seed data. It is recommended to use high-quality entropy from the end of a chain
-        /// </summary>
+        /// <inheritdoc/>
         public Module SeedSource { get => seedSource; set => seedSource = value; }
+        /// <inheritdoc/>
+        public void SetSeed(byte[] data)
+        {
+            if (data.Length < 1)
+            {
+                throw new ArgumentException($"Seed should be at least 1 byte long");
+            }
+            seed = data;
+        }
+        /// <inheritdoc/>
+        public void ForceRotateSeed()
+        {
+            RotateSeed(true);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HashExtractor" /> class
@@ -142,7 +151,7 @@ namespace TrulyRandom.Modules.Extractors
                 byte[] seed = this.seed;
                 if (!Chaining || seed == null)
                 {
-                    hashResult = hash.ComputeHash(data, i * inputBlockSize, inputBlockSize);
+                    hashResult = hash.ComputeHash(data.Subarray(i * inputBlockSize, inputBlockSize).Concat(Utils.GetSystemRandom(SeedLength)));
                 }
                 else
                 {

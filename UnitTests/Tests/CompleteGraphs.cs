@@ -3,6 +3,7 @@ using System.Threading;
 using TrulyRandom.Modules;
 using TrulyRandom.Modules.Extractors;
 using TrulyRandom.Modules.Sources;
+using TrulyRandom.Modules.Sources.Prng;
 
 namespace UnitTests
 {
@@ -156,6 +157,7 @@ namespace UnitTests
             AudioSource audioSource = new();
             VideoSource videoSource = new();
             BiologicalSource biologicalSource = new();
+
             DeflateExtractor deflateExtractor = new();
             deflateExtractor.AddSource(audioSource);
             deflateExtractor.AddSource(videoSource);
@@ -201,5 +203,60 @@ namespace UnitTests
 
             Assert.IsTrue(tester.SuccessRate > 0.3);
         }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        [TestMethod, TestCategory("RequiresHardware")]
+        public void Prng()
+        {
+            LcgPrngSource lcgSource = new();
+            XorshiftPrngSource xorshiftSource = new();
+            MtPrngSource mtSource = new();
+
+            DeflateExtractor deflateExtractor = new();
+            deflateExtractor.AddSource(lcgSource);
+            deflateExtractor.AddSource(xorshiftSource);
+            deflateExtractor.AddSource(mtSource);
+            ShuffleExtractor shuffleExtractor = new();
+            shuffleExtractor.AddSource(deflateExtractor);
+            HashExtractor hashExtractor = new();
+            hashExtractor.AddSource(shuffleExtractor);
+            Tester tester = new();
+            tester.AddSource(hashExtractor);
+            Buffer buffer = new();
+            buffer.AddSource(tester);
+
+            deflateExtractor.DynamicCoefficientSource = buffer;
+            shuffleExtractor.DynamicCoefficientSource = buffer;
+            hashExtractor.DynamicCoefficientSource = buffer;
+
+            shuffleExtractor.SeedSource = buffer;
+            hashExtractor.SeedSource = buffer;
+
+            lcgSource.Start();
+            xorshiftSource.Start();
+            mtSource.Start();
+            deflateExtractor.Start();
+            shuffleExtractor.Start();
+            hashExtractor.Start();
+            tester.Start();
+            buffer.Start();
+
+            while (!buffer.Overflow)
+            {
+                Thread.Sleep(100);
+            }
+
+            lcgSource.Dispose();
+            xorshiftSource.Dispose();
+            mtSource.Dispose();
+            deflateExtractor.Dispose();
+            shuffleExtractor.Dispose();
+            hashExtractor.Dispose();
+            tester.Dispose();
+            buffer.Dispose();
+
+            Assert.IsTrue(tester.SuccessRate > 0.3);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }
