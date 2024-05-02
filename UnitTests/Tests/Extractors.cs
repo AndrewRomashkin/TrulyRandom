@@ -267,6 +267,11 @@ namespace UnitTests
             extractor1.AddSource(buffer);
             extractor1.Start();
 
+            while (!extractor1.NoDataToProcess && !testStart.WasAgo(TimeSpan.FromSeconds(10)))
+            {
+                Thread.Sleep(10);
+            }
+
             XorExtractor extractor2 = new();
             extractor2.SetSeed(new byte[] { 0 });
             extractor2.Compression = 2;
@@ -275,7 +280,7 @@ namespace UnitTests
             extractor2.AddSource(extractor1);
             extractor2.Start();
 
-            while (!extractor1.NoDataToProcess && !extractor2.NoDataToProcess && !testStart.WasAgo(TimeSpan.FromSeconds(10)))
+            while (!extractor2.NoDataToProcess && !testStart.WasAgo(TimeSpan.FromSeconds(10)))
             {
                 Thread.Sleep(10);
             }
