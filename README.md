@@ -1,11 +1,11 @@
 # TrulyRandom
 A powerful .NET library for generating and testing high-quality truly random data using consumer hardware (generation is available only for Windows). Includes easy-to-use implementation of the [NIST SP 800-22](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-22r1a.pdf) test library. No external dependencies.
 
+![Unit tests](https://github.com/RomashkinAndrew/TrulyRandom/actions/workflows/UnitTests.yml/badge.svg?branch=main)
+
 ![TrulyRandom](https://buildstats.info/nuget/TrulyRandom)
 
 [Nuget](https://www.nuget.org/packages/TrulyRandom/)
-
-[Binaries](https://github.com/RomashkinAndrew/TrulyRandom/tree/main/TrulyRandom/bin/Release)
 
 The library allows developers to retrieve low-entropy data from microphones, cameras and user input (mouse and keyboard), process this low-entropy data into high-entropy using different randomness extractors, test it using a library of tests defined in NIST SP 800-22, store and retrieve it and finally use it to get random data of various types:
 

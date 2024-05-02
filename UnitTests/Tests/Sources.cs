@@ -20,7 +20,7 @@ namespace UnitTests
             testStart = DateTime.Now;
         }
 
-        [TestMethod]
+        [TestMethod,TestCategory("RequiresHardware")]
         public void Video()
         {
             VideoSource source = new();
@@ -42,7 +42,7 @@ namespace UnitTests
             Assert.IsFalse(source.Still);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void Audio()
         {
             AudioSource source = new();
@@ -63,7 +63,7 @@ namespace UnitTests
             Assert.IsFalse(source.Still);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         [Description("You need to wiggle your mouse and/or press keyboard keys while this test is running!!!")]
         public void Biological()
         {
@@ -84,7 +84,7 @@ namespace UnitTests
             Assert.IsTrue(success);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void Dispose()
         {
             Source[] modules = { new VideoSource(), new AudioSource(), new BiologicalSource() };
@@ -101,7 +101,7 @@ namespace UnitTests
             Assert.IsFalse(modules.Where(x => !x.Disposed).Any());
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("RequiresHardware")]
         public void DeviceLocking()
         {
             bool success = false;

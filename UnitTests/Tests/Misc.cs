@@ -492,11 +492,12 @@ namespace UnitTests
             Assert.IsTrue(b == 1);
             buffer.Write(new byte[] { 4 });
             buffer.Write(5);
+            Assert.AreEqual(3, buffer.Count);
             byte[] arr = buffer.Read(3);
             Assert.AreEqual(3, arr[0]);
             Assert.AreEqual(4, arr[1]);
             Assert.AreEqual(5, arr[2]);
-            Assert.AreEqual(3, buffer.Count);
+            Assert.AreEqual(0, buffer.Count);
         }
     }
 }
