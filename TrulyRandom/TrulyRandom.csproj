@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <EnableWindowsTargeting>True</EnableWindowsTargeting>
     
     <UseWindowsForms>False</UseWindowsForms>
     <Deterministic>False</Deterministic>
