@@ -1,108 +1,103 @@
 ﻿using System;
+using System.Collections.Generic;
 using TrulyRandom.Devices;
 using TrulyRandom.Models;
 
-namespace TrulyRandom.Modules.Sources
+namespace TrulyRandom.Modules.Sources;
+
+/// <summary>
+/// Recieves data from the audio device.
+/// </summary>
+public class AudioSource : Source
 {
     /// <summary>
-    /// Recieves data from the audio device
+    /// Underlying DirectShow device.
     /// </summary>
-    public class AudioSource : Source
+    public AudioDevice Device { get; protected set; }
+    /// <summary>
+    /// Shows whether device is running.
+    /// </summary>
+    public bool Running => Device.Running;
+    /// <summary>
+    /// Shows whether device is silent (provides the same sample over and over).
+    /// </summary>
+    public bool Still => Device.Still;
+    /// <summary>
+    /// System name of the device.
+    /// </summary>
+    public string DeviceName => Device.Name;
+
+    private void Setup()
     {
-        /// <summary>
-        /// Underlying DirectShow device
-        /// </summary>
-        public AudioDevice Device { get; protected set; } = null;
-        /// <summary>
-        /// Shows whether device is running
-        /// </summary>
-        public bool Running => Device.Running;
-        /// <summary>
-        /// Shows whether device is disposed
-        /// </summary>
-        public override bool Disposed => Device.Disposed;
-        /// <summary>
-        /// Shows whether device is silent (provides the same sample over and over)
-        /// </summary>
-        public bool Still => Device.Still;
-        /// <summary>
-        /// System name of the device
-        /// </summary>
-        public string DeviceName => Device.Name;
+        overflowHysteresis = 0.5;
+    }
 
-        void Setup()
-        {
-            overflowHysteresis = 0.5;
-        }
+    /// <summary>
+    /// Creates new <see cref="AudioSource"/> object by searching through available devices and attempting to get alternating samples from those.
+    /// </summary>
+    /// <exception cref="DeviceNotFoundException">Thrown when no suitable devices found. If device is found and then goes offline object will keep trying to establish connection and no exception will be thrown.</exception>
+    /// <param name="autoSearchTimeout">Timeout for waiting for data from the device.</param>
+    public AudioSource(int autoSearchTimeout = 5000)
+    {
+        Setup();
+        Device = new AudioDevice(autoSearchTimeout);
+        Device.NewData += Device_NewData;
+    }
 
-        /// <summary>
-        /// Creates new <see cref="AudioSource"/> object by searching through available devices and attempting to get alternating samples from those
-        /// </summary>
-        /// <exception cref="DeviceNotFoundException">Thrown when no suitable devices found. If device is found and then goes offline object will keep trying to establish connection and no exception will be thrown</exception>
-        /// <param name="autoSearchTimeout">Timeout for waiting for data from the device</param>
-        public AudioSource(int autoSearchTimeout = 5000)
-        {
-            Setup();
-            Device = new AudioDevice(autoSearchTimeout);
-            Device.NewData += Device_NewData;
-        }
+    /// <summary>
+    /// Creates new <see cref="AudioSource"/> object from given <see cref="DeviceDescriptor"/>. If device is unavailable object will keep trying to establish connection and no exception will be thrown.
+    /// </summary>
+    public AudioSource(DeviceDescriptor deviceDescriptor)
+    {
+        Setup();
+        Device = new AudioDevice(deviceDescriptor);
+        Device.NewData += Device_NewData;
+    }
 
-        /// <summary>
-        /// Creates new <see cref="AudioSource"/> object from given <see cref="DeviceDescriptor"/>. If device is unavailable object will keep trying to establish connection and no exception will be thrown
-        /// </summary>
-        public AudioSource(DeviceDescriptor deviceDescriptor)
-        {
-            Setup();
-            Device = new AudioDevice(deviceDescriptor);
-            Device.NewData += Device_NewData;
-        }
+    /// <summary>
+    /// Creates new <see cref="AudioSource"/> object from given name and moniker string. If device is unavailable object will keep trying to establish connection and no exception will be thrown.
+    /// </summary>
+    public AudioSource(string name, string monikerString)
+    {
+        Setup();
+        Device = new AudioDevice(name, monikerString);
+        Device.NewData += Device_NewData;
+    }
 
-        /// <summary>
-        /// Creates new <see cref="AudioSource"/> object from given name and moniker string. If device is unavailable object will keep trying to establish connection and no exception will be thrown
-        /// </summary>
-        public AudioSource(string name, string monikerString)
-        {
-            Setup();
-            Device = new AudioDevice(name, monikerString);
-            Device.NewData += Device_NewData;
-        }
+    /// <summary>
+    /// Returns all audio device descriptors currently available in the system.
+    /// </summary>
+    public static IEnumerable<DeviceDescriptor> AvailableDevices => AudioDevice.AvailableDevices;
 
-        /// <summary>
-        /// Returns all audio device descriptors currently available in the system
-        /// </summary>
-        public static DeviceDescriptor[] AvailableDevices => AudioDevice.AvailableDevices;
+    ///<inheritdoc/>
+    protected override void BPSCalculation()
+    {
+        BytesPerSecond = Device == null ? 0 : Device.ActualBytesPerSecond;
+    }
 
-        ///<inheritdoc/>
-        protected override void BPSCalculation()
-        {
-            BytesPerSecond = Device == null ? 0 : Device.ActualBytesPerSecond;
-        }
+    private void Device_NewData(byte[] data)
+    {
+        AddData(data);
+    }
 
-        void Device_NewData(byte[] data)
-        {
-            AddData(data);
-        }
+    ///<inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        Device.Dispose();
+        base.Dispose(disposing);
+    }
 
-        ///<inheritdoc/>
-        public override void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            base.Dispose();
-            Device.Dispose();
-        }
+    ///<inheritdoc/>
+    protected override void StartInternal()
+    {
+        base.StartInternal();
+        Device.Start();
+    }
 
-        ///<inheritdoc/>
-        protected override void StartInternal()
-        {
-            base.StartInternal();
-            Device.Start();
-        }
-
-        ///<inheritdoc/>
-        protected override void StopInternal()
-        {
-            base.StopInternal();
-            Device.Stop();
-        }
+    ///<inheritdoc/>
+    protected override void StopInternal()
+    {
+        base.StopInternal();
+        Device.Stop();
     }
 }

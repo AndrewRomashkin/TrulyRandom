@@ -3,11 +3,22 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    
     <UseWindowsForms>False</UseWindowsForms>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <AnalysisMode>All</AnalysisMode>
     <EnableWindowsTargeting>True</EnableWindowsTargeting>
+    <Deterministic>False</Deterministic>
+    <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
+
+    <_versionNumber>1.0</_versionNumber>
+    <Version>$(_versionNumber)</Version>
+    <AssemblyVersion>$(_versionNumber).*</AssemblyVersion>
+    <FileVersion>$(_versionNumber).*</FileVersion>
 
     <RootNamespace>UnitTests</RootNamespace>
+    <AssemblyName>UnitTests</AssemblyName>
+    <Authors>Romashkin Andrew</Authors>
+    <Company>$(Authors)</Company>
     <AssemblyName>UnitTests</AssemblyName>
   </PropertyGroup>
 

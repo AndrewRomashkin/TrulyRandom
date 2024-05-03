@@ -3,20 +3,23 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+
     <EnableWindowsTargeting>True</EnableWindowsTargeting>
-    
     <UseWindowsForms>False</UseWindowsForms>
-    <Deterministic>False</Deterministic>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SignAssembly>False</SignAssembly>
     <DelaySign>False</DelaySign>
+    <Deterministic>False</Deterministic>
+    <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
+    
+    <DebugType>Embedded</DebugType>
+    <AnalysisMode>All</AnalysisMode>
 
     <_versionNumber>0.7</_versionNumber>
     <Version>$(_versionNumber)</Version>
     <AssemblyVersion>$(_versionNumber).*</AssemblyVersion>
     <FileVersion>$(_versionNumber).*</FileVersion>
-    
+
     <RootNamespace>TrulyRandom</RootNamespace>
     <AssemblyName>TrulyRandom</AssemblyName>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -29,10 +32,8 @@
     <PackageTags>random;randomness;random number testing;nist</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <Deterministic>false</Deterministic>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
+
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;CA1416</NoWarn>

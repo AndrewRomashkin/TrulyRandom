@@ -1,26 +1,25 @@
-﻿namespace TrulyRandom.Models
+﻿namespace TrulyRandom.Models;
+
+/// <summary>
+/// Base class for all sources - modules that retrieve entropy from the physical world and feed it to extractors.
+/// </summary>
+public abstract class Source : Module
 {
     /// <summary>
-    /// Base class for all sources - modules that retrieve entropy from the physical world and feed it to extractors
+    /// Determines whether source should be paused when buffer is full.
     /// </summary>
-    public abstract class Source : Module
+    public bool PauseOnOverflow
     {
-        /// <summary>
-        /// Determines whether source should be paused when buffer is full
-        /// </summary>
-        public bool PauseOnOverflow
-        {
-            get => pauseOnOverflow;
-            set => pauseOnOverflow = value;
-        }
+        get => pauseOnOverflow;
+        set => pauseOnOverflow = value;
+    }
 
-        /// <summary>
-        /// If source was paused due to overflow and amount of data in the buffer is lower then this threshold - it will be unpaused
-        /// </summary>
-        protected double OverflowHysteresis
-        {
-            get => overflowHysteresis;
-            set => overflowHysteresis = value;
-        }
+    /// <summary>
+    /// If source was paused due to overflow and amount of data in the buffer is lower then this threshold - it will be unpaused.
+    /// </summary>
+    protected double OverflowHysteresis
+    {
+        get => overflowHysteresis;
+        set => overflowHysteresis = value;
     }
 }

@@ -3,12 +3,21 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+
     <UseWindowsForms>True</UseWindowsForms>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <EnableWindowsTargeting>True</EnableWindowsTargeting>
+    <Deterministic>False</Deterministic>
+    <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
+
+    <_versionNumber>1.0</_versionNumber>
+    <Version>$(_versionNumber)</Version>
+    <AssemblyVersion>$(_versionNumber).*</AssemblyVersion>
+    <FileVersion>$(_versionNumber).*</FileVersion>
     
     <RootNamespace>SampleApp</RootNamespace>
     <AssemblyName>SampleApp</AssemblyName>
+    <Authors>Romashkin Andrew</Authors>
+    <Company>$(Authors)</Company>
     <StartupObject>SampleApp.Program</StartupObject>
     <ErrorReport>queue</ErrorReport>
     <ApplicationIcon>icon.ico</ApplicationIcon>

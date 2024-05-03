@@ -1,17 +1,16 @@
 ﻿using System.Windows.Forms;
 
-namespace SampleApp
+namespace SampleApp;
+
+public class VerticalProgressBar : ProgressBar
 {
-    public class VerticalProgressBar : ProgressBar
+    protected override CreateParams CreateParams
     {
-        protected override CreateParams CreateParams
+        get
         {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.Style |= 0x04;
-                return cp;
-            }
+            CreateParams cp = base.CreateParams;
+            cp.Style |= 0x04;
+            return cp;
         }
     }
 }
