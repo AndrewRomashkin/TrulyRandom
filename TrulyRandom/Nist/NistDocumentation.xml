@@ -124,7 +124,7 @@
       number of visits to a particular state within a cycle deviates from what one would expect for a random
       sequence.This test is actually a series of eight tests (and conclusions), one test and conclusion for each of
       the states: -4, -3, -2, -1 and +1, +2, +3, +4. <br/>
-      Note that for this test it is recommended to keep sequence size as big as possible to avoid getting an <see cref="TestResultEnum.IncufficientCycles"/> resut.<br/>
+      Note that for this test it is recommended to keep sequence size as big as possible to avoid getting an <see cref="ResultType.IncufficientCycles"/> resut.<br/>
       For more info, see section 2.14 of the paper
     </summary>
   </Func>
@@ -134,7 +134,7 @@
       cumulative sum random walk. The purpose of this test is to detect deviations from the expected number
       of visits to various states in the random walk. This test is actually a series of eighteen tests (and
       conclusions), one test and conclusion for each of the states: -9, -8, …, -1 and +1, +2, …, +9.<br/>
-      Note that for this test it is recommended to keep sequence size as big as possible to avoid getting an <see cref="TestResultEnum.IncufficientCycles"/> resut.<br/>
+      Note that for this test it is recommended to keep sequence size as big as possible to avoid getting an <see cref="ResultType.IncufficientCycles"/> resut.<br/>
       For more info, see section 2.15 of the paper
     </summary>
   </Func>
