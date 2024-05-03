@@ -15,7 +15,7 @@
     <DebugType>Embedded</DebugType>
     <AnalysisMode>All</AnalysisMode>
 
-    <_versionNumber>0.7</_versionNumber>
+    <_versionNumber>0.8</_versionNumber>
     <Version>$(_versionNumber)</Version>
     <AssemblyVersion>$(_versionNumber).*</AssemblyVersion>
     <FileVersion>$(_versionNumber).*</FileVersion>
