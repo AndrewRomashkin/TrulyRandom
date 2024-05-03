@@ -35,7 +35,7 @@ jobs:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       run: |
         git fetch --depth=1 origin +refs/tags/*:refs/tags/* --quiet
-        comment=$(git tag -l --format='%(contents:subject)' ${{github.ref_name}})
+        comment=$(git tag -l --format='%(contents)' ${{github.ref_name}})
         cd TrulyRandom/bin/Release/
         zip "TrulyRandom ${{github.ref_name}}.zip" * -r
-        gh release create "${{github.ref_name}}" "TrulyRandom ${{github.ref_name}}.zip" --repo="$GITHUB_REPOSITORY"  --title="TrulyRandom v${{github.ref_name}}" -n $comment
+        gh release create "${{github.ref_name}}" "TrulyRandom ${{github.ref_name}}.zip" --repo="$GITHUB_REPOSITORY"  --title="TrulyRandom v${{github.ref_name}}" -n "$comment"
