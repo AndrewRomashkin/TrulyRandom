@@ -39,7 +39,7 @@ public partial class MainForm : Form
             deflateExtractor1 = new DeflateExtractor();
             deflateExtractor2 = new DeflateExtractor();
             shuffleExtractor = new ShuffleExtractor();
-            hashExtractor = new HashExtractor();
+            hashExtractor = new Sha512Extractor();
             tester = new Tester();
             buffer = new TrulyRandom.Modules.Buffer();
 

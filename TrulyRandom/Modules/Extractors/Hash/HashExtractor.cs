@@ -6,76 +6,24 @@ using TrulyRandom.Models;
 namespace TrulyRandom.Modules.Extractors;
 
 /// <summary>
-/// Uses hash function to compress data, eliminating dependencies within it and increasing its entropy.
+/// Base class for extractors which use hash function to compress data, eliminating dependencies within it and increasing its entropy.
 /// </summary>
-public class HashExtractor : Extractor, ISeedable
+public abstract class HashExtractor : Extractor, ISeedable
 {
     /// <summary>
     /// Size of the block processed by the hash function.
     /// </summary>
     public int InputBlockSize { get; set; } = 256;
+
     /// <summary>
     /// Size of the output block after being processed by the hash function.
     /// </summary>
     public int OutputBlockSize => hash.HashSize / 8;
 
     /// <summary>
-    /// Supported hash functions.
-    /// </summary>
-    public enum HashFunctionType
-    {
-        /// <summary>
-        /// A Message Digest 5 hash function with 128 bit block size.
-        /// </summary>
-        MD5,
-        /// <summary>
-        /// A Secure Hash Algorithm hash function with 160 bit block size.
-        /// </summary>
-        SHA1,
-        /// <summary>
-        /// A Secure Hash Algorithm 2 hash function with 256 bit block size.
-        /// </summary>
-        SHA256,
-        /// <summary>
-        /// A Secure Hash Algorithm 2 hash function with 384 bit block size.
-        /// </summary>
-        SHA384,
-        /// <summary>
-        /// A Secure Hash Algorithm 2 hash function with 512 bit block size.
-        /// </summary>
-        SHA512
-    }
-
-    /// <summary>
-    /// Selected hash function.
-    /// </summary>
-    private readonly HashFunctionType hashFunction = HashFunctionType.SHA512;
-    private HashAlgorithm hash = SHA512.Create();
-
-    /// <summary>
     /// Hash function used to process the data.
     /// </summary>
-    public HashFunctionType HashFunction
-    {
-        get => hashFunction;
-        set
-        {
-            if (hashFunction == value)
-            {
-                return;
-            }
-
-            hash = HashFunction switch
-            {
-                HashFunctionType.MD5 => MD5.Create(),
-                HashFunctionType.SHA1 => SHA1.Create(),
-                HashFunctionType.SHA256 => SHA256.Create(),
-                HashFunctionType.SHA384 => SHA384.Create(),
-                _ => SHA512.Create(),
-            };
-            ActualCompression = (double)InputBlockSize / hash.HashSize * 8;
-        }
-    }
+    private HashAlgorithm hash;
 
     /// <summary>
     /// Determines whether every output block should be XOR-ed with the previous one.
@@ -113,11 +61,17 @@ public class HashExtractor : Extractor, ISeedable
     /// <summary>
     /// Initializes a new instance of the <see cref="HashExtractor" /> class.
     /// </summary>
-    public HashExtractor()
+    protected HashExtractor()
     {
+        hash = CreateHash();
         BatchSize = 10_000;
         ActualCompression = (double)InputBlockSize / hash.HashSize * 8;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the hash algorithm.
+    /// </summary>
+    protected abstract HashAlgorithm CreateHash();
 
     private int currentMultiplier;
     ///<inheritdoc/>

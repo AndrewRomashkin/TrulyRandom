@@ -202,9 +202,8 @@ public class Misc
         TrulyRandom.Modules.Buffer buffer1 = new();
         buffer1.Start();
 
-        HashExtractor extractor = new();
+        HashExtractor extractor = new Sha512Extractor();
         extractor.BatchSize = 640;
-        extractor.HashFunction = HashExtractor.HashFunctionType.SHA512;
         extractor.InputBlockSize = 64; // compression == 1
         extractor.AddSource(buffer1);
 

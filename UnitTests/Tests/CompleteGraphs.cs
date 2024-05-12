@@ -21,7 +21,7 @@ public class CompleteGraphs
         deflateExtractor.AddSource(source);
         ShuffleExtractor shuffleExtractor = new();
         shuffleExtractor.AddSource(deflateExtractor);
-        HashExtractor hashExtractor = new();
+        HashExtractor hashExtractor = new Sha512Extractor();
         hashExtractor.AddSource(shuffleExtractor);
         Tester tester = new();
         tester.AddSource(hashExtractor);
@@ -65,7 +65,7 @@ public class CompleteGraphs
         deflateExtractor.AddSource(source);
         ShuffleExtractor shuffleExtractor = new();
         shuffleExtractor.AddSource(deflateExtractor);
-        HashExtractor hashExtractor = new();
+        HashExtractor hashExtractor = new Sha512Extractor();
         hashExtractor.AddSource(shuffleExtractor);
         Tester tester = new();
         tester.AddSource(hashExtractor);
@@ -111,7 +111,7 @@ public class CompleteGraphs
         shuffleExtractor.BatchSize = 10000;
         shuffleExtractor.BlockSize = 100;
         shuffleExtractor.AddSource(deflateExtractor);
-        HashExtractor hashExtractor = new();
+        HashExtractor hashExtractor = new Sha512Extractor();
         hashExtractor.AddSource(shuffleExtractor);
         Tester tester = new();
         tester.BatchSize = 1000;
@@ -164,7 +164,7 @@ public class CompleteGraphs
         deflateExtractor.AddSource(biologicalSource);
         ShuffleExtractor shuffleExtractor = new();
         shuffleExtractor.AddSource(deflateExtractor);
-        HashExtractor hashExtractor = new();
+        HashExtractor hashExtractor = new Sha512Extractor();
         hashExtractor.AddSource(shuffleExtractor);
         Tester tester = new();
         tester.AddSource(hashExtractor);
@@ -218,7 +218,7 @@ public class CompleteGraphs
         deflateExtractor.AddSource(mtSource);
         ShuffleExtractor shuffleExtractor = new();
         shuffleExtractor.AddSource(deflateExtractor);
-        HashExtractor hashExtractor = new();
+        HashExtractor hashExtractor = new Sha512Extractor();
         hashExtractor.AddSource(shuffleExtractor);
         Tester tester = new();
         tester.AddSource(hashExtractor);

@@ -128,9 +128,8 @@ public class Extractors
     {
         buffer.AddData(Utils.First1mDigitsOfE.ToByteArray());
 
-        HashExtractor extractor = new();
+        HashExtractor extractor = new Sha512Extractor();
         extractor.BatchSize = 5000;
-        extractor.HashFunction = HashExtractor.HashFunctionType.SHA512;
         extractor.InputBlockSize = 125; //Exactly 1000 blocks, 1000 bits each
         extractor.CalculateEntropy = true;
         extractor.AddSource(buffer);
@@ -154,10 +153,9 @@ public class Extractors
     {
         buffer.AddData(Generate1MbBadSequence());
 
-        HashExtractor extractor = new();
+        HashExtractor extractor = new Sha512Extractor();
         extractor.BatchSize = 5000;
         extractor.Chaining = false;
-        extractor.HashFunction = HashExtractor.HashFunctionType.SHA512;
         extractor.InputBlockSize = 10; //All blocks are the same
         extractor.AddSource(buffer);
         extractor.Start();
@@ -300,7 +298,7 @@ public class Extractors
     [TestMethod]
     public void Dispose()
     {
-        Extractor[] modules = { new DeflateExtractor(), new HashExtractor(), new ShuffleExtractor(), new VonNeumannExtractor() };
+        Extractor[] modules = { new DeflateExtractor(), new Sha512Extractor(), new ShuffleExtractor(), new VonNeumannExtractor() };
         foreach (Extractor module in modules)
         {
             module.Start();
